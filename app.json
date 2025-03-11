@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "Mindful Companion",
+    "slug": "mindful-companion",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./src/assets/icon.png",
+    "splash": {
+      "image": "./src/assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#6A8CAF"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yourcompany.mindfulcompanion"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./src/assets/adaptive-icon.png",
+        "backgroundColor": "#6A8CAF"
+      },
+      "package": "com.yourcompany.mindfulcompanion"
+    },
+    "web": {
+      "favicon": "./src/assets/favicon.png"
+    },
+    "sdkVersion": "52.0.0",
+    "plugins": [
+      "expo-secure-store"
+    ],
+    "newArchEnabled": true
+  }
+}
