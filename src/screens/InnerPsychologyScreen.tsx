@@ -331,12 +331,15 @@ const styles = StyleSheet.create({
   },
   resourceItemContent: {
     flexDirection: 'column',
+    paddingRight: 40,
   },
   resourceItemTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: 'bold',
     color: COLORS.WHITE,
     marginBottom: SPACING.SMALL,
+    flexWrap: 'wrap',
+    lineHeight: 20,
   },
   resourceItemDescription: {
     fontSize: 14,
@@ -345,12 +348,13 @@ const styles = StyleSheet.create({
   },
   newBadge: {
     position: 'absolute',
-    top: 10,
-    right: 10,
+    top: 0,
+    right: 0,
     backgroundColor: COLORS.HOPEFUL_CORAL,
     paddingHorizontal: SPACING.SMALL,
     paddingVertical: SPACING.XSMALL / 2,
     borderRadius: BORDER_RADIUS.SMALL,
+    margin: SPACING.SMALL,
   },
   newBadgeText: {
     color: COLORS.WHITE,
