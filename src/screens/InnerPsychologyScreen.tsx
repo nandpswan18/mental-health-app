@@ -77,7 +77,7 @@ const innerPsychologyResources: PsychologyResource[] = [
   },
   {
     id: '6',
-    title: 'Establishing Personal Acceptance Goals',
+    title: 'Personal Acceptance Goals',
     description: 'Transform your daily life by setting specific acceptance goals, enhancing emotional resilience and psychological flexibility through structured practice.',
     category: 'acceptance'
   },
@@ -328,18 +328,21 @@ const styles = StyleSheet.create({
     borderRadius: BORDER_RADIUS.MEDIUM,
     marginBottom: SPACING.MEDIUM,
     ...SHADOWS.MEDIUM,
+    minHeight: 100,
   },
   resourceItemContent: {
     flexDirection: 'column',
-    paddingRight: 40,
+    paddingRight: 50,
+    width: '100%',
   },
   resourceItemTitle: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: 'bold',
     color: COLORS.WHITE,
     marginBottom: SPACING.SMALL,
     flexWrap: 'wrap',
-    lineHeight: 20,
+    lineHeight: 18,
+    width: '90%',
   },
   resourceItemDescription: {
     fontSize: 14,

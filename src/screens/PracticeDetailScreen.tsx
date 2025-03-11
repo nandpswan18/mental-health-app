@@ -737,7 +737,7 @@ const getPracticeContent = (id: string) => {
           text: 'By practicing opposite actions, you can break the cycle of negative emotions reinforcing negative behaviors. Over time, this technique can help rewire your brain\'s automatic responses and create new, healthier emotional patterns.'
         }
       ];
-    case '6': // Establishing Personal Acceptance Goals
+    case '6': // Personal Acceptance Goals
       return [
         {
           text: 'Setting personal goals around acceptance can transform your daily life, enhancing emotional resilience and psychological flexibility. This practice helps you integrate acceptance into your routine through structured goal-setting and reflection.'
