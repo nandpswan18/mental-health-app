@@ -136,7 +136,7 @@ const InnerPsychologyScreen = () => {
       
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <Paragraph style={styles.intro}>
-          Explore psychological practices to enhance your mental wellbeing and self-awareness.
+          Accepting emotions without judgment increases self-awareness and resilience, leading to greater emotional balance. Embracing experiences openly helps manage life's challenges effectively, opening doors to new possibilities. Mindfulness, or non-judgmental focus on the present moment, further enhances this practice.
         </Paragraph>
         
         <View style={styles.categoryTabs}>
