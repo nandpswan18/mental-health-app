@@ -279,6 +279,36 @@ const getPracticeContent = (id: string) => {
           text: 'By recognising and conversing with your negative thoughts as guests, you empower yourself to understand, manage, and even transform your emotional responses.'
         }
       ];
+    case '11': // Practicing Opposite Actions
+      return [
+        {
+          text: 'Opposite action is an effective technique where you intentionally perform the reverse of what your emotions or negative thoughts urge you to do, helping you avoid unhelpful outcomes and break negative patterns of behavior.'
+        },
+        {
+          title: 'Step 1: Identify',
+          text: 'Identify a frequent negative thought or emotion you experience, such as anxiety, self-criticism, or frustration. Notice when this thought arises and what it typically makes you want to do.'
+        },
+        {
+          title: 'Step 2: Define the Opposite',
+          text: 'Clearly define an action that is directly opposite to what this thought or emotion typically motivates you to do.\n\n• If anxiety makes you want to avoid social situations, the opposite action is to engage socially.\n\n• If self-criticism makes you focus on flaws, the opposite is to list your strengths and achievements.\n\n• If frustration makes you want to give up, the opposite is to break the task into smaller steps and continue.'
+        },
+        {
+          title: 'Step 3: Practice',
+          text: 'Whenever the negative thought or emotion emerges, consciously practice the opposite action you\'ve identified. This may feel uncomfortable at first, but this discomfort is part of the growth process.'
+        },
+        {
+          title: 'Step 4: Reflect',
+          text: 'After completing the opposite action, reflect on how it affects your emotions and thought processes. Notice any shifts in your mood, perspective, or physical sensations.'
+        },
+        {
+          title: 'Example',
+          text: 'If you often think "I am not good enough," your opposite action could be to list three personal achievements or positive attributes about yourself, speak them aloud, and accept a compliment without deflecting it.'
+        },
+        {
+          title: 'Benefit',
+          text: 'By practicing opposite actions, you can break the cycle of negative emotions reinforcing negative behaviors. Over time, this technique can help rewire your brain\'s automatic responses and create new, healthier emotional patterns.'
+        }
+      ];
     default:
       return [{ text: 'Detailed information for this practice is not available.' }];
   }

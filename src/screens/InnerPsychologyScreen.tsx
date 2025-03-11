@@ -55,6 +55,12 @@ const innerPsychologyResources: PsychologyResource[] = [
     description: 'Imagine negative thoughts as guests at a gathering you\'re hosting, observing and engaging with them to understand their purpose and transform your emotional responses.',
     category: 'self-observation'
   },
+  {
+    id: '11',
+    title: 'Practicing Opposite Actions',
+    description: 'Intentionally perform the reverse of what your emotions or negative thoughts urge you to do, helping you avoid unhelpful outcomes and transform your emotional responses.',
+    category: 'self-observation'
+  },
   
   // Acceptance resources
   {
@@ -223,7 +229,7 @@ const InnerPsychologyScreen = () => {
                   <View style={styles.resourceItemContent}>
                     <Text style={styles.resourceItemTitle}>{resource.title}</Text>
                     <Text style={styles.resourceItemDescription}>{resource.description}</Text>
-                    {resource.id === '10' && (
+                    {(resource.id === '10' || resource.id === '11') && (
                       <View style={styles.newBadge}>
                         <Text style={styles.newBadgeText}>NEW</Text>
                       </View>
