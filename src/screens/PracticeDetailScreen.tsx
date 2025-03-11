@@ -261,6 +261,44 @@ const PracticeDetailScreen = () => {
 // Function to get practice content based on ID
 const getPracticeContent = (id: string) => {
   switch (id) {
+    case '1': // Observing Thoughts as an Audience Member
+      return [
+        {
+          text: 'This practice helps you step back and see your thoughts as fleeting mental events rather than factual truths. Recognizing this can free you from believing every thought that arises and create space between you and your thoughts.'
+        },
+        {
+          title: 'Preparation',
+          text: 'Find a quiet, comfortable space where you won\'t be disturbed for at least 10 minutes. Sit in a position that allows you to be alert yet relaxed, with your back straight but not rigid.'
+        },
+        {
+          title: 'Step 1: Ground Yourself',
+          text: 'Close your eyes gently. Take several slow, deep breaths, feeling your abdomen rise and fall. Allow your body to relax with each exhale, grounding yourself in the present moment.'
+        },
+        {
+          title: 'Step 2: Visualize the Theater',
+          text: 'Picture yourself sitting comfortably in an empty theater. The room is dimly lit, peaceful, and you are the only person present. In front of you is a large screen where your thoughts will be displayed like scenes from a movie.'
+        },
+        {
+          title: 'Step 3: Observe Your Thoughts',
+          text: 'As thoughts arise in your mind, imagine them appearing on the screen. Watch each thought play out without trying to change it, judge it, or become involved in its story. Simply observe it with curiosity and distance.'
+        },
+        {
+          title: 'Step 4: Label Your Thoughts',
+          text: 'When a thought appears, acknowledge it neutrally by mentally noting, "This is a thought about..." For example, "This is a thought about my meeting tomorrow" or "This is a thought about that conversation yesterday."'
+        },
+        {
+          title: 'Step 5: Let Thoughts Fade',
+          text: 'Allow each thought to naturally fade from the screen, just as scenes in a movie transition. Don\'t force thoughts away or cling to them. Simply wait patiently for the next thought to appear, maintaining your role as the audience member.'
+        },
+        {
+          title: 'Practice Tips',
+          text: '• If you find yourself getting caught up in a thought, gently remind yourself that you are the observer, not the thought itself.\n\n• Practice this exercise regularly, starting with 5 minutes and gradually increasing to 15-20 minutes.\n\n• Remember that the goal is not to have an empty mind, but to change your relationship with your thoughts.'
+        },
+        {
+          title: 'Benefits',
+          text: 'With regular practice, you\'ll develop greater awareness of your thought patterns and learn to see thoughts as mental events rather than reality. This creates freedom from automatic reactions and allows you to respond to situations with greater clarity and choice.'
+        }
+      ];
     case '10': // Visualizing Negative Thoughts as Guests
       return [
         {

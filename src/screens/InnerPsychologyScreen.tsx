@@ -33,8 +33,8 @@ const innerPsychologyResources: PsychologyResource[] = [
   // Self-Observation resources
   {
     id: '1',
-    title: 'Mindful Self-Reflection',
-    description: 'Practice observing your thoughts and feelings without judgment, noticing patterns in your mental habits.',
+    title: 'Observing Thoughts as an Audience Member',
+    description: 'Practice viewing your thoughts as scenes on a screen, helping you step back and see them as fleeting mental events rather than factual truths.',
     category: 'self-observation'
   },
   {
@@ -229,7 +229,7 @@ const InnerPsychologyScreen = () => {
                   <View style={styles.resourceItemContent}>
                     <Text style={styles.resourceItemTitle}>{resource.title}</Text>
                     <Text style={styles.resourceItemDescription}>{resource.description}</Text>
-                    {(resource.id === '10' || resource.id === '11') && (
+                    {(resource.id === '1' || resource.id === '10' || resource.id === '11') && (
                       <View style={styles.newBadge}>
                         <Text style={styles.newBadgeText}>NEW</Text>
                       </View>
