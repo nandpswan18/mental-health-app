@@ -71,8 +71,8 @@ const innerPsychologyResources: PsychologyResource[] = [
   },
   {
     id: '5',
-    title: 'Self-Compassion',
-    description: 'Treat yourself with the same kindness and understanding you would offer to a good friend facing difficulties.',
+    title: 'Embracing Uncertainty: The Uncertainty Box',
+    description: 'Learn to accept and coexist with uncertainty through a symbolic exercise of placing uncertain thoughts in a container to find peace and emotional well-being.',
     category: 'acceptance'
   },
   {
@@ -229,7 +229,7 @@ const InnerPsychologyScreen = () => {
                   <View style={styles.resourceItemContent}>
                     <Text style={styles.resourceItemTitle}>{resource.title}</Text>
                     <Text style={styles.resourceItemDescription}>{resource.description}</Text>
-                    {(resource.id === '1' || resource.id === '2' || resource.id === '4' || resource.id === '10' || resource.id === '11') && (
+                    {(resource.id === '1' || resource.id === '2' || resource.id === '4' || resource.id === '5' || resource.id === '10' || resource.id === '11') && (
                       <View style={styles.newBadge}>
                         <Text style={styles.newBadgeText}>NEW</Text>
                       </View>

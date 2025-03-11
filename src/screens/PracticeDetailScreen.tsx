@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, StatusBar, KeyboardAvoidingView, Platform, TextInput as RNTextInput, Alert } from 'react-native';
-import { Text, Title, Paragraph, IconButton, Surface, Divider, TextInput, Button } from 'react-native-paper';
+import { Text, Title, Paragraph, IconButton, Surface, Divider, TextInput, Button, Card } from 'react-native-paper';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 import { format } from 'date-fns';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 // Import design system
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../styles/DesignSystem';
@@ -32,6 +33,10 @@ const PracticeDetailScreen = () => {
   const [notes, setNotes] = useState('');
   const [isSaving, setSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<string | null>(null);
+  
+  // State for uncertainty box
+  const [uncertaintyText, setUncertaintyText] = useState('');
+  const [hasLetGo, setHasLetGo] = useState(false);
   
   // Load saved notes when the screen opens
   useEffect(() => {
@@ -175,6 +180,20 @@ const PracticeDetailScreen = () => {
     }
   };
 
+  // Handle letting go of uncertainty
+  const handleLetGo = () => {
+    if (uncertaintyText.trim() === '') {
+      Alert.alert('Empty Uncertainty', 'Please write down your uncertainty before letting it go.');
+      return;
+    }
+    
+    setHasLetGo(true);
+    setTimeout(() => {
+      setUncertaintyText('');
+      setHasLetGo(false);
+    }, 3000);
+  };
+
   return (
     <KeyboardAvoidingView 
       style={[styles.container, { paddingTop: insets.top }]}
@@ -217,42 +236,92 @@ const PracticeDetailScreen = () => {
           ))}
         </View>
         
-        {/* Notes Section */}
-        <View style={styles.notesContainer}>
-          <Text style={styles.notesTitle}>Your Notes</Text>
-          <Text style={styles.notesDescription}>
-            Record your thoughts and feelings about this practice. How did it help you? What did you notice during the exercise?
-          </Text>
-          
-          <TextInput
-            style={styles.notesInput}
-            multiline
-            mode="outlined"
-            placeholder="Write your notes here..."
-            value={notes}
-            onChangeText={setNotes}
-            outlineColor="rgba(255, 255, 255, 0.2)"
-            activeOutlineColor={getCategoryColor()}
-            textColor="rgba(255, 255, 255, 0.9)"
-            placeholderTextColor="rgba(255, 255, 255, 0.5)"
-            theme={{ colors: { background: '#1A2A4A' } }}
-          />
-          
-          <View style={styles.saveContainer}>
-            {lastSaved && (
-              <Text style={styles.lastSavedText}>Last saved: {lastSaved}</Text>
-            )}
-            <Button 
-              mode="contained" 
-              onPress={saveNotes} 
-              loading={isSaving}
-              disabled={isSaving}
-              style={[styles.saveButton, { backgroundColor: getCategoryColor() }]}
-            >
-              {isSaving ? 'Saving...' : 'Save Notes'}
-            </Button>
+        {/* Uncertainty Box (only for id '5') */}
+        {id === '5' && (
+          <Card style={styles.uncertaintyBox}>
+            <Card.Content>
+              <View style={styles.uncertaintyHeader}>
+                <MaterialCommunityIcons name="package-variant-closed" size={24} color={getCategoryColor()} />
+                <Text style={styles.uncertaintyTitle}>Your Uncertainty Box</Text>
+              </View>
+              
+              <Divider style={styles.uncertaintyDivider} />
+              
+              {hasLetGo ? (
+                <View style={styles.letGoContainer}>
+                  <MaterialCommunityIcons name="check-circle-outline" size={48} color={getCategoryColor()} />
+                  <Text style={styles.letGoText}>You've let that go</Text>
+                  <Text style={styles.letGoSubtext}>Your uncertainty has been placed in the box</Text>
+                </View>
+              ) : (
+                <>
+                  <Text style={styles.uncertaintyPrompt}>
+                    Write down an uncertain thought or situation causing you anxiety:
+                  </Text>
+                  
+                  <TextInput
+                    style={styles.uncertaintyInput}
+                    multiline
+                    mode="outlined"
+                    placeholder="I'm uncertain about..."
+                    value={uncertaintyText}
+                    onChangeText={setUncertaintyText}
+                    outlineColor="rgba(0, 0, 0, 0.2)"
+                    activeOutlineColor={getCategoryColor()}
+                    theme={{ colors: { background: '#fff' } }}
+                  />
+                  
+                  <Button 
+                    mode="contained" 
+                    onPress={handleLetGo} 
+                    style={[styles.letGoButton, { backgroundColor: getCategoryColor() }]}
+                  >
+                    Place in Uncertainty Box
+                  </Button>
+                </>
+              )}
+            </Card.Content>
+          </Card>
+        )}
+        
+        {/* Notes Section (not for id '5') */}
+        {id !== '5' && (
+          <View style={styles.notesContainer}>
+            <Text style={styles.notesTitle}>Your Notes</Text>
+            <Text style={styles.notesDescription}>
+              Record your thoughts and feelings about this practice. How did it help you? What did you notice during the exercise?
+            </Text>
+            
+            <TextInput
+              style={styles.notesInput}
+              multiline
+              mode="outlined"
+              placeholder="Write your notes here..."
+              value={notes}
+              onChangeText={setNotes}
+              outlineColor="rgba(255, 255, 255, 0.2)"
+              activeOutlineColor={getCategoryColor()}
+              textColor="rgba(255, 255, 255, 0.9)"
+              placeholderTextColor="rgba(255, 255, 255, 0.5)"
+              theme={{ colors: { background: '#1A2A4A' } }}
+            />
+            
+            <View style={styles.saveContainer}>
+              {lastSaved && (
+                <Text style={styles.lastSavedText}>Last saved: {lastSaved}</Text>
+              )}
+              <Button 
+                mode="contained" 
+                onPress={saveNotes} 
+                loading={isSaving}
+                disabled={isSaving}
+                style={[styles.saveButton, { backgroundColor: getCategoryColor() }]}
+              >
+                {isSaving ? 'Saving...' : 'Save Notes'}
+              </Button>
+            </View>
           </View>
-        </View>
+        )}
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -389,6 +458,48 @@ const getPracticeContent = (id: string) => {
         {
           title: 'Benefits',
           text: 'Regular practice of loving detachment can help you:\n\n• Reduce anxiety and emotional suffering\n\n• Improve relationships by respecting others\' autonomy\n\n• Increase your capacity for genuine compassion\n\n• Develop greater emotional resilience\n\n• Find peace amid life\'s uncertainties'
+        }
+      ];
+    case '5': // Embracing Uncertainty: The Uncertainty Box
+      return [
+        {
+          text: 'Uncertainty is inevitable in life, but learning to accept and coexist with it can bring increased peace and emotional well-being. The "Uncertainty Box" exercise helps you practice embracing uncertainty in a constructive way, giving you a symbolic method to acknowledge uncertainties without letting them control your thoughts and emotions.'
+        },
+        {
+          title: 'What You\'ll Need',
+          text: 'While this digital exercise provides a virtual uncertainty box, you might consider creating a physical one as well. For a physical practice, find a small box or container with a lid that you can keep in a private space.'
+        },
+        {
+          title: 'Step 1: Create Space',
+          text: 'Set aside quiet time free from distractions. Find a comfortable position and take a few deep breaths to center yourself.'
+        },
+        {
+          title: 'Step 2: Identify Uncertainties',
+          text: 'Think about an uncertain situation or thought that\'s causing you anxiety or concern. This could be related to your health, relationships, career, or any area of life where the outcome is unknown and causing you distress.'
+        },
+        {
+          title: 'Step 3: Write It Down',
+          text: 'In the digital uncertainty box below (or on a small piece of paper for the physical practice), write down this uncertain thought. Be specific about what you\'re uncertain about and how it makes you feel.'
+        },
+        {
+          title: 'Step 4: Place It in the Box',
+          text: 'Click the button to symbolically place your uncertainty in the box (or fold the paper and place it in your physical box). As you do this, take a deep breath and remind yourself that uncertainty is a natural part of life that everyone experiences.'
+        },
+        {
+          title: 'Step 5: Seal the Box',
+          text: 'Mentally seal the box, entrusting your uncertainty to it. This represents acknowledging that the uncertainty exists while choosing not to let it dominate your thoughts and emotions.'
+        },
+        {
+          title: 'Step 6: Practice Redirection',
+          text: 'Whenever you begin worrying about this uncertainty again, remind yourself it is safely stored in the box. Instead of ruminating, redirect your attention to what you can control in the present moment, and trust in your ability to handle whatever outcome eventually unfolds.'
+        },
+        {
+          title: 'Step 7: Continue the Practice',
+          text: 'Return to this exercise whenever new uncertainties arise that cause you distress. Over time, you\'ll build a greater capacity to live peacefully alongside the unknowns in your life.'
+        },
+        {
+          title: 'Benefits',
+          text: 'This practice helps you:\n\n• Acknowledge uncertainties without being consumed by them\n\n• Reduce anxiety about the unknown\n\n• Develop greater emotional resilience\n\n• Focus your energy on what you can control\n\n• Build trust in your ability to adapt to whatever happens'
         }
       ];
     case '10': // Visualizing Negative Thoughts as Guests
@@ -547,6 +658,56 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     borderRadius: BORDER_RADIUS.SMALL,
+  },
+  uncertaintyBox: {
+    marginTop: SPACING.LARGE,
+    borderRadius: BORDER_RADIUS.MEDIUM,
+    ...SHADOWS.MEDIUM,
+  },
+  uncertaintyHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.SMALL,
+  },
+  uncertaintyTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginLeft: SPACING.SMALL,
+    color: '#333',
+  },
+  uncertaintyDivider: {
+    marginBottom: SPACING.MEDIUM,
+  },
+  uncertaintyPrompt: {
+    fontSize: 16,
+    marginBottom: SPACING.MEDIUM,
+    color: '#333',
+  },
+  uncertaintyInput: {
+    minHeight: 120,
+    marginBottom: SPACING.MEDIUM,
+    backgroundColor: '#fff',
+  },
+  letGoButton: {
+    marginTop: SPACING.SMALL,
+    marginBottom: SPACING.SMALL,
+  },
+  letGoContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: SPACING.LARGE,
+  },
+  letGoText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginTop: SPACING.MEDIUM,
+    color: '#333',
+  },
+  letGoSubtext: {
+    fontSize: 14,
+    marginTop: SPACING.SMALL,
+    color: '#666',
+    textAlign: 'center',
   },
 });
 
