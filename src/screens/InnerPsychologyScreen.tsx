@@ -39,8 +39,8 @@ const innerPsychologyResources: PsychologyResource[] = [
   },
   {
     id: '2',
-    title: 'Emotional Awareness',
-    description: 'Learn to identify and name your emotions as they arise, tracking their intensity and triggers.',
+    title: 'Engaging with Critical Thoughts',
+    description: 'Open a dialogue with your inner critic to uncover deeper beliefs, fears, and past experiences that influence your mindset and self-perception.',
     category: 'self-observation'
   },
   {
@@ -229,7 +229,7 @@ const InnerPsychologyScreen = () => {
                   <View style={styles.resourceItemContent}>
                     <Text style={styles.resourceItemTitle}>{resource.title}</Text>
                     <Text style={styles.resourceItemDescription}>{resource.description}</Text>
-                    {(resource.id === '1' || resource.id === '10' || resource.id === '11') && (
+                    {(resource.id === '1' || resource.id === '2' || resource.id === '10' || resource.id === '11') && (
                       <View style={styles.newBadge}>
                         <Text style={styles.newBadgeText}>NEW</Text>
                       </View>

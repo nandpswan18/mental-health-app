@@ -299,6 +299,48 @@ const getPracticeContent = (id: string) => {
           text: 'With regular practice, you\'ll develop greater awareness of your thought patterns and learn to see thoughts as mental events rather than reality. This creates freedom from automatic reactions and allows you to respond to situations with greater clarity and choice.'
         }
       ];
+    case '2': // Engaging with Critical Thoughts
+      return [
+        {
+          text: 'Engaging directly with your inner critic can provide valuable insights into your deeper beliefs, fears, and past experiences that influence your mindset. This exercise helps you open a meaningful dialogue with your critical inner voice, transforming self-criticism into self-understanding.'
+        },
+        {
+          title: 'Preparation',
+          text: 'Find a quiet, comfortable space where you won\'t be disturbed. Have a journal or note-taking app ready to record insights that emerge during this practice.'
+        },
+        {
+          title: 'Step 1: Identify a Critical Thought',
+          text: 'Think of a recurring critical thought or negative self-perception that you often experience. For example: "I\'m not good enough," "I always mess things up," or "I\'ll never succeed at this." Write this thought down.'
+        },
+        {
+          title: 'Step 2: Acknowledge the Thought',
+          text: 'Sit quietly with this thought for a moment. Notice any physical sensations, emotions, or additional thoughts that arise. Acknowledge the thought without judgment, simply observing its presence.'
+        },
+        {
+          title: 'Step 3: Visualize Your Inner Critic',
+          text: 'Imagine this critical thought as an entity or character seated across from you. What does it look like? What is its tone of voice? Is it reminiscent of anyone from your past? Give this inner critic a form that feels authentic to you.'
+        },
+        {
+          title: 'Step 4: Begin the Dialogue',
+          text: 'Start a gentle conversation with your inner critic, asking questions such as:\n\n• Where did this belief originate?\n\n• Whose voice does this remind me of?\n\n• What experiences have shaped this thought?\n\n• How might this criticism be trying to protect or help me?\n\n• What are you afraid would happen if you stopped criticizing me?'
+        },
+        {
+          title: 'Step 5: Listen Openly',
+          text: 'Allow answers to emerge naturally, without censoring your intuitive responses. Write down what comes up, even if it surprises you. Listen with curiosity rather than defensiveness.'
+        },
+        {
+          title: 'Step 6: Identify Patterns',
+          text: 'Note any recurring themes or patterns revealed through this dialogue. Look for connections between your current self-criticism and past experiences or relationships.'
+        },
+        {
+          title: 'Example',
+          text: 'If you often think, "I am a burden to others," this belief might trace back to childhood experiences of feeling unsupported or rejected. Perhaps you learned to minimize your needs to maintain relationships. Your inner critic might be trying to protect you from rejection by encouraging you to withdraw or avoid asking for help.'
+        },
+        {
+          title: 'Benefits',
+          text: 'This practice helps you:\n\n• Develop self-compassion by understanding the origins of your self-criticism\n\n• Recognize that critical thoughts often stem from past experiences, not present reality\n\n• Transform your relationship with your inner critic from adversarial to collaborative\n\n• Create space for new, more supportive self-talk patterns'
+        }
+      ];
     case '10': // Visualizing Negative Thoughts as Guests
       return [
         {
