@@ -4,9 +4,21 @@ import { Text, Title, Paragraph, IconButton, Surface } from 'react-native-paper'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 // Import design system
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../styles/DesignSystem';
+
+// Define navigation type
+type RootStackParamList = {
+  PracticeDetail: {
+    id: string;
+    title: string;
+    category: 'self-observation' | 'acceptance' | 'present-moment';
+  };
+};
+
+type InnerPsychologyScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 // Define psychology resource type
 interface PsychologyResource {
@@ -86,9 +98,18 @@ const innerPsychologyResources: PsychologyResource[] = [
 ];
 
 const InnerPsychologyScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<InnerPsychologyScreenNavigationProp>();
   const insets = useSafeAreaInsets();
   const [activePsychologyCategory, setActivePsychologyCategory] = useState<'self-observation' | 'acceptance' | 'present-moment'>('self-observation');
+
+  // Function to handle resource item press
+  const handleResourcePress = (resource: PsychologyResource) => {
+    navigation.navigate('PracticeDetail', {
+      id: resource.id,
+      title: resource.title,
+      category: resource.category
+    });
+  };
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -186,20 +207,30 @@ const InnerPsychologyScreen = () => {
           {innerPsychologyResources
             .filter(resource => resource.category === activePsychologyCategory)
             .map(resource => (
-              <Surface 
+              <TouchableOpacity 
                 key={resource.id} 
-                style={[
-                  styles.resourceItem,
-                  resource.category === 'self-observation' && { borderLeftColor: COLORS.SERENITY_BLUE },
-                  resource.category === 'acceptance' && { borderLeftColor: COLORS.HOPEFUL_CORAL },
-                  resource.category === 'present-moment' && { borderLeftColor: COLORS.MINDFUL_MINT }
-                ]}
+                onPress={() => handleResourcePress(resource)}
+                activeOpacity={0.7}
               >
-                <View style={styles.resourceItemContent}>
-                  <Text style={styles.resourceItemTitle}>{resource.title}</Text>
-                  <Text style={styles.resourceItemDescription}>{resource.description}</Text>
-                </View>
-              </Surface>
+                <Surface 
+                  style={[
+                    styles.resourceItem,
+                    resource.category === 'self-observation' && { borderLeftColor: COLORS.SERENITY_BLUE },
+                    resource.category === 'acceptance' && { borderLeftColor: COLORS.HOPEFUL_CORAL },
+                    resource.category === 'present-moment' && { borderLeftColor: COLORS.MINDFUL_MINT }
+                  ]}
+                >
+                  <View style={styles.resourceItemContent}>
+                    <Text style={styles.resourceItemTitle}>{resource.title}</Text>
+                    <Text style={styles.resourceItemDescription}>{resource.description}</Text>
+                    {resource.id === '10' && (
+                      <View style={styles.newBadge}>
+                        <Text style={styles.newBadgeText}>NEW</Text>
+                      </View>
+                    )}
+                  </View>
+                </Surface>
+              </TouchableOpacity>
             ))}
         </View>
       </ScrollView>
@@ -305,6 +336,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: 'rgba(255, 255, 255, 0.7)',
     lineHeight: 20,
+  },
+  newBadge: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: COLORS.HOPEFUL_CORAL,
+    paddingHorizontal: SPACING.SMALL,
+    paddingVertical: SPACING.XSMALL / 2,
+    borderRadius: BORDER_RADIUS.SMALL,
+  },
+  newBadgeText: {
+    color: COLORS.WHITE,
+    fontSize: 10,
+    fontWeight: 'bold',
   },
 });
 

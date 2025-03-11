@@ -1,65 +1,69 @@
-# Mindful Companion
+# Mental Health App
 
-A modern mobile application designed to provide mindfulness support through an AI chat interface, progress tracking, and guided practices.
+A mobile application designed to support mental health and wellbeing through various features and resources.
 
-## Core Features
+## Features
 
-- **AI Chat Interface**: Engage with an AI assistant for mindfulness guidance and support
-- **User Authentication**: Secure login and registration system
-- **Progress Tracking**: Monitor your mindfulness journey with mood tracking and insights
-- **Practice Library**: Access guided meditations, exercises, and mindfulness techniques
+- **Profile Management**: Personalized user profiles with customizable settings
+- **Crisis Resources**: Quick access to emergency contacts and crisis helplines
+- **Inner Psychology**: Explore psychological practices for mental wellbeing and self-awareness
+- **Journal**: Record thoughts, feelings, and daily reflections
+- **Resources**: Access to various mental health resources and practices
 
-## Tech Stack
+## Technologies Used
 
-- React Native / Expo
-- TypeScript
-- Firebase Authentication and Firestore
+- React Native
+- Expo
 - React Navigation
-- React Native Paper (UI components)
-- Expo Linear Gradient
-
-## Modern Design Elements
-
-- **Clean UI**: Minimalist interface with ample white space
-- **Gradient Accents**: Subtle color gradients for visual interest
-- **Card-Based Layout**: Content organized in modern card components
-- **Smooth Animations**: Fade-in effects and fluid transitions
-- **Consistent Typography**: Clear hierarchy with modern font styling
+- React Native Paper
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js (v14 or newer)
+- Node.js
 - npm or yarn
 - Expo CLI
 
 ### Installation
 
 1. Clone the repository
-2. Install dependencies:
    ```
-   cd MentalHealthApp
+   git clone https://github.com/yourusername/mental-health-app.git
+   ```
+
+2. Navigate to the project directory
+   ```
+   cd mental-health-app
+   ```
+
+3. Install dependencies
+   ```
    npm install
    ```
-3. Start the development server:
+   or
    ```
-   npm start
+   yarn install
    ```
 
-## App Structure
+4. Start the development server
+   ```
+   npx expo start
+   ```
 
-- **screens/**: Main application screens
-- **components/**: Reusable UI components
-- **navigation/**: Navigation configuration
-- **services/**: API and backend services
-- **assets/**: Images, fonts, and other static assets
-- **utils/**: Utility functions
-- **hooks/**: Custom React hooks
+## Screenshots
 
-## Design Principles
+(Screenshots will be added soon)
 
-- **Color Scheme**: Modern blues with clean white backgrounds
-- **Typography**: Clear, readable fonts with proper hierarchy
-- **User Experience**: Smooth animations and intuitive navigation
-- **Accessibility**: Support for screen readers and adjustable text sizes 
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments
+
+- Thanks to all the contributors who have helped with the development of this app
+- Special thanks to mental health professionals who provided guidance on content 

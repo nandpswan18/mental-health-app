@@ -15,6 +15,7 @@ import ProfileSetupScreen from '../screens/ProfileSetupScreen';
 import JournalScreen from '../screens/JournalScreen';
 import JournalHistoryScreen from '../screens/JournalHistoryScreen';
 import InnerPsychologyScreen from '../screens/InnerPsychologyScreen';
+import PracticeDetailScreen from '../screens/PracticeDetailScreen';
 
 // Import auth context
 import { useAuth } from '../contexts/AuthContext';
@@ -39,6 +40,11 @@ type RootStackParamList = {
   Journal: undefined;
   JournalHistory: undefined;
   InnerPsychology: undefined;
+  PracticeDetail: {
+    id: string;
+    title: string;
+    category: 'self-observation' | 'acceptance' | 'present-moment';
+  };
 };
 
 // Create navigators
@@ -120,6 +126,7 @@ const AppNavigator = () => {
             <RootStack.Screen name="Journal" component={JournalScreen} />
             <RootStack.Screen name="JournalHistory" component={JournalHistoryScreen} />
             <RootStack.Screen name="InnerPsychology" component={InnerPsychologyScreen} />
+            <RootStack.Screen name="PracticeDetail" component={PracticeDetailScreen} />
           </>
         )
       ) : (
