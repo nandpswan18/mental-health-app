@@ -40,6 +40,30 @@ export const COLORS = {
   DEEPER_REFLECTION: '#2C3E50', // Darker, more calming version of Deep Reflection
   NIGHT_MODE_BG: '#1A2639', // Very dark blue for night mode backgrounds
   NIGHT_MODE_CARD: '#2C3E50', // Dark blue for cards in night mode
+  
+  // New Modern Color Palette
+  MODERN_PRIMARY: '#6C63FF', // Modern purple - primary color
+  MODERN_SECONDARY: '#4ECDC4', // Teal - secondary color
+  MODERN_ACCENT: '#FF6B6B', // Coral red - accent color
+  MODERN_HIGHLIGHT: '#FFE66D', // Soft yellow - highlight color
+  MODERN_SUCCESS: '#2EC4B6', // Turquoise - success color
+  MODERN_WARNING: '#FF9F1C', // Orange - warning color
+  MODERN_ERROR: '#FF5252', // Red - error color
+  
+  // Modern Neutrals
+  MODERN_BG_LIGHT: '#F7F9FC', // Very light blue-gray - background light
+  MODERN_BG_DARK: '#1A1B25', // Very dark blue-gray - background dark
+  MODERN_CARD_LIGHT: '#FFFFFF', // White - card light
+  MODERN_CARD_DARK: '#252A34', // Dark blue-gray - card dark
+  MODERN_TEXT_PRIMARY: '#2D3748', // Dark gray-blue - primary text
+  MODERN_TEXT_SECONDARY: '#718096', // Medium gray-blue - secondary text
+  MODERN_BORDER_LIGHT: '#E2E8F0', // Light gray - border light
+  MODERN_BORDER_DARK: '#4A5568', // Dark gray - border dark
+  
+  // Modern Gradients (as string values for linear gradients)
+  MODERN_GRADIENT_PRIMARY: 'linear-gradient(135deg, #6C63FF 0%, #4ECDC4 100%)',
+  MODERN_GRADIENT_ACCENT: 'linear-gradient(135deg, #FF6B6B 0%, #FFE66D 100%)',
+  MODERN_GRADIENT_DARK: 'linear-gradient(135deg, #252A34 0%, #1A1B25 100%)',
 };
 
 // Typography

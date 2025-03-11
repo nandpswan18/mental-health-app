@@ -1,15 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, TouchableOpacity, ScrollView, Image, Dimensions, RefreshControl } from 'react-native';
-import { Text, Card, Button, Title, Paragraph, useTheme, Surface, Avatar, IconButton, Divider, Badge } from 'react-native-paper';
+import { 
+  View, 
+  StyleSheet, 
+  TouchableOpacity, 
+  ScrollView, 
+  Image, 
+  Dimensions, 
+  RefreshControl,
+  ImageBackground,
+  Platform,
+  StatusBar as RNStatusBar
+} from 'react-native';
+import { 
+  Text, 
+  Button, 
+  Avatar, 
+  IconButton, 
+  Divider, 
+  Badge,
+  Surface,
+  ProgressBar
+} from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { useAuth } from '../contexts/AuthContext';
-import AnimatedCharacter from '../components/AnimatedCharacter';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS, TYPOGRAPHY } from '../styles/DesignSystem';
 
 // Define the navigation param list type
@@ -44,9 +64,45 @@ const dailyTips = [
 
 // Add type for MaterialCommunityIcons names
 type MaterialCommunityIconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
+type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
+
+// Quick action items
+const quickActions = [
+  {
+    id: 'journal',
+    title: 'Journal',
+    description: 'Record your thoughts and feelings',
+    icon: 'book-outline' as IoniconsName,
+    color: COLORS.MODERN_PRIMARY,
+    route: 'Journal'
+  },
+  {
+    id: 'chat',
+    title: 'Chat Support',
+    description: 'Talk with your AI companion',
+    icon: 'chatbubble-outline' as IoniconsName,
+    color: COLORS.MODERN_SECONDARY,
+    route: 'Chat'
+  },
+  {
+    id: 'resources',
+    title: 'Resources',
+    description: 'Explore helpful content',
+    icon: 'library-outline' as IoniconsName,
+    color: COLORS.MODERN_ACCENT,
+    route: 'Resources'
+  },
+  {
+    id: 'breathing',
+    title: 'Breathing',
+    description: '2-minute breathing exercise',
+    icon: 'fitness-outline' as IoniconsName,
+    color: COLORS.MODERN_HIGHLIGHT,
+    route: 'Breathing'
+  }
+];
 
 const HomeScreen = () => {
-  const theme = useTheme();
   const navigation = useNavigation<MainTabNavigationProp>();
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
@@ -58,6 +114,7 @@ const HomeScreen = () => {
   const [currentMood, setCurrentMood] = useState<number | null>(null);
   const [dailyTip, setDailyTip] = useState('');
   const [refreshing, setRefreshing] = useState(false);
+  const [wellnessScore, setWellnessScore] = useState(75); // Mock wellness score
 
   const loadData = async () => {
     // Load journal data
@@ -113,13 +170,6 @@ const HomeScreen = () => {
     if (hour < 18) return 'afternoon';
     return 'evening';
   };
-
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Take a moment to breathe and set your intentions for the day.';
-    if (hour < 18) return 'Remember to pause and check in with yourself today.';
-    return 'It\'s time to unwind and reflect on your day.';
-  };
   
   const formatDate = (dateString: string | null) => {
     if (!dateString) return 'Never';
@@ -148,11 +198,11 @@ const HomeScreen = () => {
   
   const getMoodColor = (mood: number) => {
     const colors = [
-      COLORS.MOOD_TERRIBLE,
-      COLORS.MOOD_BAD,
-      COLORS.MOOD_NEUTRAL,
-      COLORS.MOOD_GOOD,
-      COLORS.MOOD_GREAT
+      COLORS.MODERN_ERROR,
+      COLORS.MODERN_WARNING,
+      COLORS.MODERN_HIGHLIGHT,
+      COLORS.MODERN_SECONDARY,
+      COLORS.MODERN_SUCCESS
     ];
     return colors[mood - 1] || colors[2];
   };
@@ -174,26 +224,31 @@ const HomeScreen = () => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: COLORS.DEEP_CLOUD_GREY }]}>
+    <View style={styles.container}>
       <StatusBar style="light" />
       
-      {/* Profile Header */}
-      <View style={[styles.header, { paddingTop: insets.top, backgroundColor: COLORS.DEEP_SERENITY_BLUE }]}>
+      {/* Gradient Header */}
+      <LinearGradient
+        colors={[COLORS.MODERN_PRIMARY, COLORS.MODERN_SECONDARY]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={[styles.header, { paddingTop: insets.top + (RNStatusBar.currentHeight || 0) }]}
+      >
         <View style={styles.headerContent}>
           <View>
-            <Text style={styles.greeting}>Good {timeOfDay()},</Text>
+            <Text style={styles.greeting}>Good {timeOfDay()}</Text>
             <Text style={styles.userName}>{user?.name || 'Friend'}</Text>
           </View>
           <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
             <Avatar.Text 
-              size={50} 
+              size={48} 
               label={(user?.name?.charAt(0) || 'U') + (user?.name?.split(' ')[1]?.charAt(0) || '')} 
-              style={{ backgroundColor: COLORS.DEEP_MINDFUL_MINT }}
-              labelStyle={{ color: COLORS.DEEPER_REFLECTION }}
+              style={styles.avatar}
+              labelStyle={{ color: COLORS.MODERN_PRIMARY }}
             />
           </TouchableOpacity>
         </View>
-      </View>
+      </LinearGradient>
       
       <ScrollView 
         style={styles.scrollView}
@@ -203,189 +258,157 @@ const HomeScreen = () => {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={[COLORS.DEEP_SERENITY_BLUE]}
-            tintColor={COLORS.DEEP_SERENITY_BLUE}
+            colors={[COLORS.MODERN_PRIMARY]}
+            tintColor={COLORS.MODERN_PRIMARY}
           />
         }
       >
-        {/* Daily Tip Card */}
-        <Card style={styles.tipCard}>
-          <Card.Content style={styles.tipContent}>
-            <MaterialCommunityIcons name="lightbulb-outline" size={24} color={COLORS.DEEP_GOLDEN_GLOW} />
-            <View style={styles.tipTextContainer}>
-              <Text style={styles.tipTitle}>Daily Tip</Text>
-              <Text style={styles.tipText}>{dailyTip}</Text>
+        {/* Wellness Score Card */}
+        <Surface style={styles.wellnessCard}>
+          <View style={styles.wellnessHeader}>
+            <View>
+              <Text style={styles.wellnessTitle}>Wellness Score</Text>
+              <Text style={styles.wellnessSubtitle}>Based on your activity and mood</Text>
             </View>
-          </Card.Content>
-        </Card>
-        
-        {/* Current Mood Section */}
-        <View style={styles.sectionContainer}>
-          <View style={styles.sectionHeader}>
-            <MaterialCommunityIcons name="emoticon-outline" size={24} color={COLORS.DEEPER_REFLECTION} />
-            <Text style={styles.sectionTitle}>How are you feeling today?</Text>
+            <View style={styles.wellnessScoreCircle}>
+              <Text style={styles.wellnessScoreText}>{wellnessScore}</Text>
+            </View>
           </View>
-          <Card style={styles.card}>
-            <Card.Content>
-              <View style={styles.moodSelector}>
-                {[1, 2, 3, 4, 5].map((mood) => (
-                  <TouchableOpacity
-                    key={mood}
-                    style={[
-                      styles.moodButton,
-                      currentMood === mood && { 
-                        backgroundColor: getMoodColor(mood),
-                        transform: [{ scale: 1.1 }]
-                      }
-                    ]}
-                    onPress={() => handleMoodSelection(mood)}
-                  >
-                    <MaterialCommunityIcons 
-                      name={getMoodIcon(mood)} 
-                      size={28} 
-                      color={currentMood === mood ? COLORS.WHITE : COLORS.DEEPER_REFLECTION} 
-                    />
-                    <Text 
-                      style={[
-                        styles.moodText, 
-                        currentMood === mood && { color: COLORS.WHITE }
-                      ]}
-                    >
-                      {getMoodName(mood)}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-              {currentMood && (
-                <View style={styles.moodFeedback}>
-                  <Text style={styles.moodFeedbackText}>
-                    {currentMood <= 2 
-                      ? "It's okay to not feel your best. Consider journaling about your feelings or using a coping strategy." 
-                      : "That's great! Keep track of what's working well for you in your journal."}
-                  </Text>
-                </View>
-              )}
-            </Card.Content>
-          </Card>
-        </View>
-        
-        {/* Your Journey Section */}
-        <View style={styles.sectionContainer}>
-          <View style={styles.sectionHeader}>
-            <MaterialCommunityIcons name="chart-timeline-variant" size={24} color={COLORS.DEEPER_REFLECTION} />
-            <Text style={styles.sectionTitle}>Your Journey</Text>
+          <ProgressBar 
+            progress={wellnessScore / 100} 
+            color={COLORS.MODERN_PRIMARY} 
+            style={styles.wellnessProgress} 
+          />
+          <View style={styles.wellnessStats}>
+            <View style={styles.wellnessStat}>
+              <Ionicons name="journal-outline" size={20} color={COLORS.MODERN_PRIMARY} />
+              <Text style={styles.wellnessStatValue}>{journalCount}</Text>
+              <Text style={styles.wellnessStatLabel}>Entries</Text>
+            </View>
+            <View style={styles.wellnessStat}>
+              <Ionicons name="flame-outline" size={20} color={COLORS.MODERN_ACCENT} />
+              <Text style={styles.wellnessStatValue}>{streakCount}</Text>
+              <Text style={styles.wellnessStatLabel}>Streak</Text>
+            </View>
+            <View style={styles.wellnessStat}>
+              <Ionicons name="calendar-outline" size={20} color={COLORS.MODERN_SECONDARY} />
+              <Text style={styles.wellnessStatValue}>{lastJournalDate ? formatDate(lastJournalDate).split(',')[0] : 'None'}</Text>
+              <Text style={styles.wellnessStatLabel}>Last Entry</Text>
+            </View>
           </View>
-          <Card style={styles.card}>
-            <Card.Content>
-              <View style={styles.statsRow}>
-                <View style={styles.statItem}>
-                  <MaterialCommunityIcons name="notebook-outline" size={24} color={COLORS.DEEP_SERENITY_BLUE} />
-                  <Text style={styles.statNumber}>{journalCount}</Text>
-                  <Text style={styles.statLabel}>Journal Entries</Text>
-                </View>
-                <View style={styles.statDivider} />
-                <View style={styles.statItem}>
-                  <MaterialCommunityIcons name="fire" size={24} color={COLORS.DEEP_HOPEFUL_CORAL} />
-                  <Text style={styles.statNumber}>{streakCount}</Text>
-                  <Text style={styles.statLabel}>Day Streak</Text>
-                </View>
-                <View style={styles.statDivider} />
-                <View style={styles.statItem}>
-                  <MaterialCommunityIcons name="calendar-check" size={24} color={COLORS.DEEP_MINDFUL_MINT} />
-                  <Text style={styles.statDate}>{lastJournalDate ? formatDate(lastJournalDate) : 'Never'}</Text>
-                  <Text style={styles.statLabel}>Last Entry</Text>
-                </View>
-              </View>
-              
-              <Button 
-                mode="contained" 
-                onPress={() => navigation.navigate('Journal')}
-                style={[styles.journalButton, { backgroundColor: COLORS.DEEP_SERENITY_BLUE }]}
-                labelStyle={{ color: COLORS.WHITE }}
-                icon="pencil"
-              >
-                New Journal Entry
-              </Button>
-            </Card.Content>
-          </Card>
-        </View>
+        </Surface>
+        
+        {/* Daily Tip Card */}
+        <Surface style={styles.tipCard}>
+          <View style={styles.tipHeader}>
+            <Ionicons name="bulb-outline" size={24} color={COLORS.MODERN_HIGHLIGHT} />
+            <Text style={styles.tipTitle}>Daily Insight</Text>
+          </View>
+          <Text style={styles.tipText}>{dailyTip}</Text>
+        </Surface>
         
         {/* Quick Actions Section */}
-        <View style={styles.sectionContainer}>
-          <View style={styles.sectionHeader}>
-            <MaterialCommunityIcons name="lightning-bolt" size={24} color={COLORS.DEEPER_REFLECTION} />
-            <Text style={styles.sectionTitle}>Quick Actions</Text>
-          </View>
-          <View style={styles.quickActionsGrid}>
-            <TouchableOpacity 
-              style={styles.quickActionCard}
-              onPress={() => navigation.navigate('Chat')}
-            >
-              <View style={[styles.iconCircle, { backgroundColor: COLORS.DEEP_SERENITY_BLUE }]}>
-                <MaterialCommunityIcons name="chat-processing-outline" size={24} color={COLORS.WHITE} />
-              </View>
-              <Text style={styles.quickActionText}>Chat Support</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.quickActionCard}
-              onPress={() => navigation.navigate('Resources')}
-            >
-              <View style={[styles.iconCircle, { backgroundColor: COLORS.DEEP_MINDFUL_MINT }]}>
-                <MaterialCommunityIcons name="heart-pulse" size={24} color={COLORS.WHITE} />
-              </View>
-              <Text style={styles.quickActionText}>Resources</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.quickActionCard}
-              onPress={() => {/* Start breathing exercise */}}
-            >
-              <View style={[styles.iconCircle, { backgroundColor: COLORS.DEEP_HOPEFUL_CORAL }]}>
-                <MaterialCommunityIcons name="meditation" size={24} color={COLORS.WHITE} />
-              </View>
-              <Text style={styles.quickActionText}>Breathing</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.quickActionCard}
-              onPress={() => navigation.navigate('Profile')}
-            >
-              <View style={[styles.iconCircle, { backgroundColor: COLORS.DEEP_GOLDEN_GLOW }]}>
-                <MaterialCommunityIcons name="account-outline" size={24} color={COLORS.WHITE} />
-              </View>
-              <Text style={styles.quickActionText}>Profile</Text>
-            </TouchableOpacity>
-          </View>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Quick Actions</Text>
+          <TouchableOpacity>
+            <Text style={styles.seeAllText}>See All</Text>
+          </TouchableOpacity>
         </View>
         
-        {/* Mindfulness Exercise */}
-        <View style={styles.sectionContainer}>
-          <View style={styles.sectionHeader}>
-            <MaterialCommunityIcons name="meditation" size={24} color={COLORS.DEEPER_REFLECTION} />
-            <Text style={styles.sectionTitle}>Mindfulness Exercise</Text>
-          </View>
-          <Card style={styles.card}>
-            <Card.Content>
-              <View style={styles.mindfulnessHeader}>
-                <Text style={styles.mindfulnessTitle}>2-Minute Breathing Exercise</Text>
-                <Badge style={[styles.newBadge, { backgroundColor: COLORS.DEEP_HOPEFUL_CORAL }]}>NEW</Badge>
+        <View style={styles.quickActionsGrid}>
+          {quickActions.map(action => (
+            <TouchableOpacity 
+              key={action.id}
+              style={styles.quickActionCard}
+              onPress={() => navigation.navigate(action.route as any)}
+            >
+              <View style={[styles.quickActionIconContainer, { backgroundColor: action.color + '20' }]}>
+                <Ionicons name={action.icon} size={24} color={action.color} />
               </View>
-              <Text style={styles.mindfulnessDescription}>
-                Take a moment to breathe deeply. Inhale for 4 counts, hold for 4, and exhale for 6. This simple practice can help reduce stress and increase focus.
-              </Text>
-              <Button 
-                mode="contained" 
-                onPress={() => {/* Start breathing exercise */}}
-                style={[styles.mindfulnessButton, { backgroundColor: COLORS.DEEP_SERENITY_BLUE }]}
-                labelStyle={{ color: COLORS.WHITE }}
-                icon="play"
-              >
-                Start Exercise
-              </Button>
-            </Card.Content>
-          </Card>
+              <Text style={styles.quickActionTitle}>{action.title}</Text>
+              <Text style={styles.quickActionDescription}>{action.description}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
+        
+        {/* Mood Tracker Section */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>How are you feeling?</Text>
+        </View>
+        
+        <Surface style={styles.moodCard}>
+          <View style={styles.moodSelector}>
+            {[1, 2, 3, 4, 5].map((mood) => (
+              <TouchableOpacity
+                key={mood}
+                style={[
+                  styles.moodButton,
+                  currentMood === mood && { 
+                    backgroundColor: getMoodColor(mood) + '30',
+                    borderColor: getMoodColor(mood),
+                  }
+                ]}
+                onPress={() => handleMoodSelection(mood)}
+              >
+                <MaterialCommunityIcons 
+                  name={getMoodIcon(mood)} 
+                  size={28} 
+                  color={getMoodColor(mood)} 
+                />
+                <Text 
+                  style={[
+                    styles.moodText, 
+                    { color: getMoodColor(mood) }
+                  ]}
+                >
+                  {getMoodName(mood)}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          {currentMood && (
+            <View style={styles.moodFeedback}>
+              <Text style={styles.moodFeedbackText}>
+                {currentMood <= 2 
+                  ? "It's okay to not feel your best. Consider journaling about your feelings or using a coping strategy." 
+                  : "That's great! Keep track of what's working well for you in your journal."}
+              </Text>
+            </View>
+          )}
+        </Surface>
+        
+        {/* Featured Exercise */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Featured Exercise</Text>
+        </View>
+        
+        <TouchableOpacity>
+          <Surface style={styles.featuredCard}>
+            <View style={styles.featuredContent}>
+              <View>
+                <View style={styles.featuredBadgeContainer}>
+                  <Text style={styles.featuredBadge}>NEW</Text>
+                </View>
+                <Text style={styles.featuredTitle}>2-Minute Breathing</Text>
+                <Text style={styles.featuredDescription}>
+                  A quick breathing exercise to help you relax and refocus
+                </Text>
+                <Button 
+                  mode="contained" 
+                  onPress={() => {/* Start breathing exercise */}}
+                  style={styles.featuredButton}
+                  labelStyle={styles.featuredButtonLabel}
+                  icon="play"
+                >
+                  Start Now
+                </Button>
+              </View>
+              <View style={styles.featuredImageContainer}>
+                <Ionicons name="fitness" size={80} color={COLORS.MODERN_PRIMARY + '50'} />
+              </View>
+            </View>
+          </Surface>
+        </TouchableOpacity>
         
         {/* Bottom padding */}
         <View style={{ height: insets.bottom + 20 }} />
@@ -397,27 +420,19 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: SPACING.MEDIUM,
+    backgroundColor: COLORS.MODERN_BG_LIGHT,
   },
   header: {
     paddingHorizontal: SPACING.MEDIUM,
     paddingBottom: SPACING.LARGE,
     borderBottomLeftRadius: BORDER_RADIUS.LARGE,
     borderBottomRightRadius: BORDER_RADIUS.LARGE,
-    ...SHADOWS.MEDIUM,
   },
   headerContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: SPACING.MEDIUM,
-    marginBottom: SPACING.SMALL,
   },
   greeting: {
     fontSize: TYPOGRAPHY.FONT_SIZE.MEDIUM,
@@ -429,111 +444,117 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: COLORS.WHITE,
   },
-  tipCard: {
-    marginTop: -SPACING.LARGE,
-    borderRadius: BORDER_RADIUS.MEDIUM,
-    ...SHADOWS.MEDIUM,
+  avatar: {
     backgroundColor: COLORS.WHITE,
-    marginBottom: SPACING.MEDIUM,
   },
-  tipContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  tipTextContainer: {
-    marginLeft: SPACING.SMALL,
+  scrollView: {
     flex: 1,
   },
-  tipTitle: {
-    fontSize: TYPOGRAPHY.FONT_SIZE.MEDIUM,
+  scrollContent: {
+    flexGrow: 1,
+    padding: SPACING.MEDIUM,
+  },
+  wellnessCard: {
+    borderRadius: BORDER_RADIUS.MEDIUM,
+    padding: SPACING.MEDIUM,
+    marginTop: -SPACING.XLARGE,
+    backgroundColor: COLORS.WHITE,
+    ...SHADOWS.MEDIUM,
+    elevation: 4,
+  },
+  wellnessHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.MEDIUM,
+  },
+  wellnessTitle: {
+    fontSize: TYPOGRAPHY.FONT_SIZE.LARGE,
     fontWeight: '700',
-    color: COLORS.DEEPER_REFLECTION,
-    marginBottom: SPACING.TINY,
+    color: COLORS.MODERN_TEXT_PRIMARY,
   },
-  tipText: {
+  wellnessSubtitle: {
+    fontSize: TYPOGRAPHY.FONT_SIZE.SMALL,
+    color: COLORS.MODERN_TEXT_SECONDARY,
+    marginTop: 2,
+  },
+  wellnessScoreCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: COLORS.MODERN_PRIMARY + '15',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  wellnessScoreText: {
+    fontSize: TYPOGRAPHY.FONT_SIZE.XLARGE,
+    fontWeight: 'bold',
+    color: COLORS.MODERN_PRIMARY,
+  },
+  wellnessProgress: {
+    height: 8,
+    borderRadius: 4,
+    marginBottom: SPACING.MEDIUM,
+    backgroundColor: COLORS.MODERN_PRIMARY + '20',
+  },
+  wellnessStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  wellnessStat: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  wellnessStatValue: {
     fontSize: TYPOGRAPHY.FONT_SIZE.MEDIUM,
-    color: COLORS.DEEPER_REFLECTION,
-    opacity: 0.8,
+    fontWeight: '600',
+    color: COLORS.MODERN_TEXT_PRIMARY,
+    marginTop: 4,
   },
-  sectionContainer: {
-    marginBottom: SPACING.LARGE,
+  wellnessStatLabel: {
+    fontSize: TYPOGRAPHY.FONT_SIZE.TINY,
+    color: COLORS.MODERN_TEXT_SECONDARY,
+    marginTop: 2,
   },
-  sectionHeader: {
+  tipCard: {
+    borderRadius: BORDER_RADIUS.MEDIUM,
+    padding: SPACING.MEDIUM,
+    marginTop: SPACING.MEDIUM,
+    backgroundColor: COLORS.WHITE,
+    ...SHADOWS.SMALL,
+  },
+  tipHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: SPACING.SMALL,
   },
+  tipTitle: {
+    fontSize: TYPOGRAPHY.FONT_SIZE.MEDIUM,
+    fontWeight: '600',
+    color: COLORS.MODERN_TEXT_PRIMARY,
+    marginLeft: SPACING.SMALL,
+  },
+  tipText: {
+    fontSize: TYPOGRAPHY.FONT_SIZE.MEDIUM,
+    color: COLORS.MODERN_TEXT_SECONDARY,
+    lineHeight: 22,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: SPACING.LARGE,
+    marginBottom: SPACING.MEDIUM,
+  },
   sectionTitle: {
     fontSize: TYPOGRAPHY.FONT_SIZE.LARGE,
     fontWeight: '700',
-    color: COLORS.DEEPER_REFLECTION,
-    marginLeft: SPACING.SMALL,
+    color: COLORS.MODERN_TEXT_PRIMARY,
   },
-  card: {
-    borderRadius: BORDER_RADIUS.MEDIUM,
-    ...SHADOWS.SMALL,
-    backgroundColor: COLORS.WHITE,
-  },
-  moodSelector: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: SPACING.MEDIUM,
-  },
-  moodButton: {
-    alignItems: 'center',
-    padding: SPACING.SMALL,
-    borderRadius: BORDER_RADIUS.MEDIUM,
-    backgroundColor: COLORS.DEEP_CLOUD_GREY,
-    width: '18%',
-  },
-  moodText: {
-    fontSize: TYPOGRAPHY.FONT_SIZE.TINY,
-    marginTop: SPACING.TINY,
-    color: COLORS.DEEPER_REFLECTION,
-  },
-  moodFeedback: {
-    backgroundColor: COLORS.DEEP_CLOUD_GREY,
-    padding: SPACING.SMALL,
-    borderRadius: BORDER_RADIUS.SMALL,
-  },
-  moodFeedbackText: {
+  seeAllText: {
     fontSize: TYPOGRAPHY.FONT_SIZE.SMALL,
-    color: COLORS.DEEPER_REFLECTION,
-  },
-  statsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: SPACING.MEDIUM,
-  },
-  statItem: {
-    flex: 1,
-    alignItems: 'center',
-    padding: SPACING.SMALL,
-  },
-  statDivider: {
-    width: 1,
-    backgroundColor: COLORS.DEEP_CLOUD_GREY,
-  },
-  statNumber: {
-    fontSize: TYPOGRAPHY.FONT_SIZE.XLARGE,
-    fontWeight: '700',
-    color: COLORS.DEEPER_REFLECTION,
-    marginVertical: SPACING.TINY,
-  },
-  statDate: {
-    fontSize: TYPOGRAPHY.FONT_SIZE.SMALL,
+    color: COLORS.MODERN_PRIMARY,
     fontWeight: '600',
-    color: COLORS.DEEPER_REFLECTION,
-    marginVertical: SPACING.TINY,
-    textAlign: 'center',
-  },
-  statLabel: {
-    fontSize: TYPOGRAPHY.FONT_SIZE.SMALL,
-    color: COLORS.DEEPER_REFLECTION,
-    opacity: 0.7,
-  },
-  journalButton: {
-    borderRadius: BORDER_RADIUS.MEDIUM,
   },
   quickActionsGrid: {
     flexDirection: 'row',
@@ -546,45 +567,110 @@ const styles = StyleSheet.create({
     borderRadius: BORDER_RADIUS.MEDIUM,
     padding: SPACING.MEDIUM,
     marginBottom: SPACING.MEDIUM,
-    alignItems: 'center',
     ...SHADOWS.SMALL,
   },
-  iconCircle: {
-    width: 50,
-    height: 50,
-    borderRadius: BORDER_RADIUS.CIRCLE,
+  quickActionIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: BORDER_RADIUS.MEDIUM,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SPACING.SMALL,
   },
-  quickActionText: {
+  quickActionTitle: {
     fontSize: TYPOGRAPHY.FONT_SIZE.MEDIUM,
-    color: COLORS.DEEPER_REFLECTION,
+    fontWeight: '600',
+    color: COLORS.MODERN_TEXT_PRIMARY,
+    marginBottom: 4,
+  },
+  quickActionDescription: {
+    fontSize: TYPOGRAPHY.FONT_SIZE.SMALL,
+    color: COLORS.MODERN_TEXT_SECONDARY,
+  },
+  moodCard: {
+    borderRadius: BORDER_RADIUS.MEDIUM,
+    padding: SPACING.MEDIUM,
+    backgroundColor: COLORS.WHITE,
+    ...SHADOWS.SMALL,
+  },
+  moodSelector: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: SPACING.MEDIUM,
+  },
+  moodButton: {
+    alignItems: 'center',
+    padding: SPACING.SMALL,
+    borderRadius: BORDER_RADIUS.MEDIUM,
+    backgroundColor: COLORS.MODERN_BG_LIGHT,
+    width: '18%',
+    borderWidth: 1,
+    borderColor: COLORS.MODERN_BORDER_LIGHT,
+  },
+  moodText: {
+    fontSize: TYPOGRAPHY.FONT_SIZE.TINY,
+    marginTop: SPACING.TINY,
     fontWeight: '500',
   },
-  mindfulnessHeader: {
+  moodFeedback: {
+    backgroundColor: COLORS.MODERN_BG_LIGHT,
+    padding: SPACING.SMALL,
+    borderRadius: BORDER_RADIUS.SMALL,
+  },
+  moodFeedbackText: {
+    fontSize: TYPOGRAPHY.FONT_SIZE.SMALL,
+    color: COLORS.MODERN_TEXT_SECONDARY,
+    lineHeight: 18,
+  },
+  featuredCard: {
+    borderRadius: BORDER_RADIUS.MEDIUM,
+    padding: SPACING.MEDIUM,
+    backgroundColor: COLORS.WHITE,
+    ...SHADOWS.SMALL,
+  },
+  featuredContent: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  featuredBadgeContainer: {
+    backgroundColor: COLORS.MODERN_ACCENT + '20',
+    paddingHorizontal: SPACING.SMALL,
+    paddingVertical: 2,
+    borderRadius: BORDER_RADIUS.SMALL,
+    alignSelf: 'flex-start',
     marginBottom: SPACING.SMALL,
   },
-  mindfulnessTitle: {
+  featuredBadge: {
+    fontSize: TYPOGRAPHY.FONT_SIZE.TINY,
+    fontWeight: '700',
+    color: COLORS.MODERN_ACCENT,
+  },
+  featuredTitle: {
     fontSize: TYPOGRAPHY.FONT_SIZE.LARGE,
-    fontWeight: '600',
-    color: COLORS.DEEPER_REFLECTION,
+    fontWeight: '700',
+    color: COLORS.MODERN_TEXT_PRIMARY,
+    marginBottom: SPACING.SMALL,
   },
-  newBadge: {
-    backgroundColor: COLORS.DEEP_HOPEFUL_CORAL,
-  },
-  mindfulnessDescription: {
+  featuredDescription: {
     fontSize: TYPOGRAPHY.FONT_SIZE.MEDIUM,
-    color: COLORS.DEEPER_REFLECTION,
-    opacity: 0.8,
+    color: COLORS.MODERN_TEXT_SECONDARY,
     marginBottom: SPACING.MEDIUM,
-    lineHeight: 22,
+    width: '70%',
+    lineHeight: 20,
   },
-  mindfulnessButton: {
+  featuredButton: {
+    backgroundColor: COLORS.MODERN_PRIMARY,
     borderRadius: BORDER_RADIUS.MEDIUM,
+    paddingVertical: 6,
+    alignSelf: 'flex-start',
+  },
+  featuredButtonLabel: {
+    fontSize: TYPOGRAPHY.FONT_SIZE.SMALL,
+    fontWeight: '600',
+  },
+  featuredImageContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
