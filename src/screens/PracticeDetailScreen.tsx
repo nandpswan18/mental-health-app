@@ -341,6 +341,56 @@ const getPracticeContent = (id: string) => {
           text: 'This practice helps you:\n\n• Develop self-compassion by understanding the origins of your self-criticism\n\n• Recognize that critical thoughts often stem from past experiences, not present reality\n\n• Transform your relationship with your inner critic from adversarial to collaborative\n\n• Create space for new, more supportive self-talk patterns'
         }
       ];
+    case '4': // Practicing Loving Detachment
+      return [
+        {
+          text: 'Loving detachment helps you maintain emotional balance by gently releasing attachments and expectations around situations or relationships. This guided visualization practice helps you cultivate a sense of loving detachment, allowing you to care deeply while releasing the need to control outcomes.'
+        },
+        {
+          title: 'Preparation',
+          text: 'Find a quiet, comfortable place where you won\'t be disturbed for at least 10-15 minutes. Sit or lie down in a position that allows you to be both relaxed and alert.'
+        },
+        {
+          title: 'Step 1: Ground Yourself',
+          text: 'Take a few deep, calming breaths. Inhale slowly through your nose for a count of four, hold briefly, then exhale through your mouth for a count of six. Feel your body becoming more relaxed with each breath.'
+        },
+        {
+          title: 'Step 2: Identify an Attachment',
+          text: 'Bring to mind a situation or relationship where you feel overly emotionally attached or where you\'re struggling to let go of control. This could be a relationship, a work situation, a personal goal, or any circumstance where your emotional investment feels heavy or burdensome.'
+        },
+        {
+          title: 'Step 3: Acknowledge Your Feelings',
+          text: 'Notice what emotions arise as you think about this situation. Acknowledge and honor these feelings without judgment. You might silently say, "I notice I\'m feeling [emotion], and that\'s okay."'
+        },
+        {
+          title: 'Step 4: Visualize Protective Light',
+          text: 'Imagine yourself enveloped in a warm bubble or shield of protective light. This light represents love, compassion, and wisdom. Feel it surrounding you completely, creating a safe space where you can observe your attachments with gentle awareness.'
+        },
+        {
+          title: 'Step 5: Practice an Affirmation',
+          text: 'Silently or softly repeat an affirmation that resonates with you, such as:\n\n• "I release control and trust in life\'s unfolding process."\n\n• "I can care deeply without needing to control outcomes."\n\n• "I detach with love, allowing others their own journey."\n\n• "I am separate from this situation, yet connected through compassion."'
+        },
+        {
+          title: 'Step 6: Observe Without Attachment',
+          text: 'Mindfully observe your thoughts and emotions about the situation, allowing them to come and go freely without getting caught up in them. Imagine them as clouds passing through the sky of your awareness.'
+        },
+        {
+          title: 'Step 7: Send Loving Energy',
+          text: 'Send loving, positive energy toward the situation or person involved. Visualize this energy as a gentle light extending from your heart. As you do this, consciously release your attachment to specific outcomes or expectations.'
+        },
+        {
+          title: 'Step 8: Release and Let Go',
+          text: 'Focus on forgiveness, acceptance, and letting go. You might visualize yourself gently opening your hands and releasing the situation, watching it float away while maintaining a sense of love and goodwill.'
+        },
+        {
+          title: 'Step 9: Express Gratitude',
+          text: 'End this practice by expressing gratitude for the insights and emotional clarity gained. Acknowledge your own courage in practicing loving detachment.'
+        },
+        {
+          title: 'Benefits',
+          text: 'Regular practice of loving detachment can help you:\n\n• Reduce anxiety and emotional suffering\n\n• Improve relationships by respecting others\' autonomy\n\n• Increase your capacity for genuine compassion\n\n• Develop greater emotional resilience\n\n• Find peace amid life\'s uncertainties'
+        }
+      ];
     case '10': // Visualizing Negative Thoughts as Guests
       return [
         {

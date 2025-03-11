@@ -65,8 +65,8 @@ const innerPsychologyResources: PsychologyResource[] = [
   // Acceptance resources
   {
     id: '4',
-    title: 'Radical Acceptance',
-    description: 'Practice acknowledging reality as it is, without fighting against painful situations that cannot be immediately changed.',
+    title: 'Practicing Loving Detachment',
+    description: 'Maintain emotional balance by gently releasing attachments and expectations around situations or relationships through guided visualization.',
     category: 'acceptance'
   },
   {
@@ -229,7 +229,7 @@ const InnerPsychologyScreen = () => {
                   <View style={styles.resourceItemContent}>
                     <Text style={styles.resourceItemTitle}>{resource.title}</Text>
                     <Text style={styles.resourceItemDescription}>{resource.description}</Text>
-                    {(resource.id === '1' || resource.id === '2' || resource.id === '10' || resource.id === '11') && (
+                    {(resource.id === '1' || resource.id === '2' || resource.id === '4' || resource.id === '10' || resource.id === '11') && (
                       <View style={styles.newBadge}>
                         <Text style={styles.newBadgeText}>NEW</Text>
                       </View>
