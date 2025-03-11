@@ -13,11 +13,23 @@ import {
   Portal,
   Dialog,
   Chip,
-  FAB
+  FAB,
+  Avatar
 } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
 import { format, parseISO } from 'date-fns';
+import { COLORS } from '../styles/DesignSystem';
+
+// Define navigation type
+type RootStackParamList = {
+  Journal: undefined;
+  PracticeDetail: {
+    id: string;
+    title: string;
+    category: 'self-observation' | 'acceptance' | 'present-moment';
+  };
+};
 
 // Define the journal entry interface
 interface JournalEntry {
@@ -42,6 +54,13 @@ interface JournalEntry {
   currentFeeling: string[];
   notes: string;
   skippedSections: string[];
+  practiceNotes?: {
+    practiceId: string;
+    practiceTitle: string;
+    practiceCategory: 'self-observation' | 'acceptance' | 'present-moment';
+    notes: string;
+    timestamp: string;
+  };
 }
 
 const JournalHistoryScreen = () => {
@@ -103,46 +122,80 @@ const JournalHistoryScreen = () => {
     // Get overall feeling
     const overallFeeling = item.overallFeeling || 'Not recorded';
     
+    // Check if this is a practice note entry
+    const isPracticeNote = !!item.practiceNotes;
+    
     return (
       <TouchableOpacity onPress={() => handleEntryPress(item)}>
-        <Card style={styles.entryCard}>
+        <Card style={[styles.entryCard, isPracticeNote && styles.practiceEntryCard]}>
           <Card.Content>
-            <Title style={styles.entryDate}>{formatDate(item.date)}</Title>
-            
-            <View style={styles.entryPreview}>
-              <View style={styles.previewItem}>
-                <Text style={styles.previewLabel}>Feeling:</Text>
-                <Text style={styles.previewValue}>{primaryEmotion}</Text>
-              </View>
-              
-              <View style={styles.previewItem}>
-                <Text style={styles.previewLabel}>Overall:</Text>
-                <Text 
+            <View style={styles.entryHeader}>
+              <Title style={styles.entryDate}>{formatDate(item.date)}</Title>
+              {isPracticeNote && (
+                <Chip 
+                  icon="meditation" 
                   style={[
-                    styles.previewValue, 
-                    { color: getOverallFeelingColor(overallFeeling) }
+                    styles.practiceChip, 
+                    { backgroundColor: getPracticeCategoryColor(item.practiceNotes?.practiceCategory) }
                   ]}
                 >
-                  {overallFeeling}
-                </Text>
-              </View>
+                  Practice
+                </Chip>
+              )}
             </View>
             
-            {item.emotions.length > 0 && (
-              <View style={styles.emotionsPreview}>
-                {item.emotions.slice(0, 3).map((emotion, index) => (
-                  <Chip 
-                    key={index} 
-                    style={styles.emotionChip}
-                    textStyle={styles.emotionChipText}
-                  >
-                    {emotion}
-                  </Chip>
-                ))}
-                {item.emotions.length > 3 && (
-                  <Text style={styles.moreEmotions}>+{item.emotions.length - 3} more</Text>
+            {isPracticeNote ? (
+              <View style={styles.practicePreview}>
+                <Text style={styles.practiceTitle}>{item.practiceNotes?.practiceTitle}</Text>
+                <Text style={styles.practiceCategory}>
+                  {item.practiceNotes?.practiceCategory === 'self-observation' && 'Self-Observation'}
+                  {item.practiceNotes?.practiceCategory === 'acceptance' && 'Acceptance'}
+                  {item.practiceNotes?.practiceCategory === 'present-moment' && 'Present Moment'}
+                </Text>
+                {item.practiceNotes?.notes && (
+                  <Text style={styles.practiceNotesPreview} numberOfLines={2}>
+                    {item.practiceNotes.notes}
+                  </Text>
                 )}
               </View>
+            ) : (
+              <>
+                <View style={styles.entryPreview}>
+                  <View style={styles.previewItem}>
+                    <Text style={styles.previewLabel}>Feeling:</Text>
+                    <Text style={styles.previewValue}>{primaryEmotion}</Text>
+                  </View>
+                  
+                  <View style={styles.previewItem}>
+                    <Text style={styles.previewLabel}>Overall:</Text>
+                    <Text 
+                      style={[
+                        styles.previewValue, 
+                        { color: getOverallFeelingColor(overallFeeling) }
+                      ]}
+                    >
+                      {overallFeeling}
+                    </Text>
+                  </View>
+                </View>
+                
+                {item.emotions.length > 0 && (
+                  <View style={styles.emotionsPreview}>
+                    {item.emotions.slice(0, 3).map((emotion, index) => (
+                      <Chip 
+                        key={index} 
+                        style={styles.emotionChip}
+                        textStyle={styles.emotionChipText}
+                      >
+                        {emotion}
+                      </Chip>
+                    ))}
+                    {item.emotions.length > 3 && (
+                      <Text style={styles.moreEmotions}>+{item.emotions.length - 3} more</Text>
+                    )}
+                  </View>
+                )}
+              </>
             )}
           </Card.Content>
         </Card>
@@ -168,9 +221,26 @@ const JournalHistoryScreen = () => {
     }
   };
 
+  // Get color based on practice category
+  const getPracticeCategoryColor = (category?: 'self-observation' | 'acceptance' | 'present-moment') => {
+    switch (category) {
+      case 'self-observation':
+        return COLORS.SERENITY_BLUE;
+      case 'acceptance':
+        return COLORS.HOPEFUL_CORAL;
+      case 'present-moment':
+        return COLORS.MINDFUL_MINT;
+      default:
+        return COLORS.SERENITY_BLUE;
+    }
+  };
+
   // Render entry detail dialog
   const renderEntryDetailDialog = () => {
     if (!selectedEntry) return null;
+    
+    // Check if this is a practice note entry
+    const isPracticeNote = !!selectedEntry.practiceNotes;
     
     return (
       <Portal>
@@ -182,178 +252,237 @@ const JournalHistoryScreen = () => {
           <Dialog.Title>{formatDate(selectedEntry.date)}</Dialog.Title>
           <Dialog.ScrollArea style={styles.dialogScrollArea}>
             <View style={styles.dialogContent}>
-              {/* Emotions */}
-              <View style={styles.detailSection}>
-                <Text style={styles.detailSectionTitle}>Emotions</Text>
-                <View style={styles.emotionsContainer}>
-                  {selectedEntry.emotions.length > 0 ? (
-                    selectedEntry.emotions.map((emotion, index) => (
-                      <Chip 
-                        key={index} 
-                        style={styles.detailChip}
-                        textStyle={styles.detailChipText}
-                      >
-                        {emotion}
-                      </Chip>
-                    ))
-                  ) : (
-                    <Text style={styles.noDataText}>No emotions recorded</Text>
-                  )}
+              {isPracticeNote ? (
+                // Practice Notes Content
+                <View style={styles.practiceNotesDetail}>
+                  <View style={[
+                    styles.practiceHeader, 
+                    { backgroundColor: getPracticeCategoryColor(selectedEntry.practiceNotes?.practiceCategory) }
+                  ]}>
+                    <Avatar.Icon 
+                      size={40} 
+                      icon="meditation" 
+                      style={styles.practiceIcon}
+                      color="#fff"
+                    />
+                    <View style={styles.practiceHeaderText}>
+                      <Text style={styles.practiceDetailTitle}>
+                        {selectedEntry.practiceNotes?.practiceTitle}
+                      </Text>
+                      <Text style={styles.practiceDetailCategory}>
+                        {selectedEntry.practiceNotes?.practiceCategory === 'self-observation' && 'Self-Observation'}
+                        {selectedEntry.practiceNotes?.practiceCategory === 'acceptance' && 'Acceptance'}
+                        {selectedEntry.practiceNotes?.practiceCategory === 'present-moment' && 'Present Moment'}
+                      </Text>
+                    </View>
+                  </View>
+                  
+                  <View style={styles.practiceNotesContent}>
+                    <Text style={styles.practiceNotesLabel}>Your Notes:</Text>
+                    <Paragraph style={styles.practiceNotesText}>
+                      {selectedEntry.practiceNotes?.notes || 'No notes recorded.'}
+                    </Paragraph>
+                    
+                    <Text style={styles.practiceTimestamp}>
+                      Recorded on: {format(new Date(selectedEntry.practiceNotes?.timestamp || ''), 'PPpp')}
+                    </Text>
+                    
+                    <Button 
+                      mode="contained" 
+                      onPress={() => {
+                        setShowEntryDialog(false);
+                        navigation.navigate('PracticeDetail' as never, {
+                          id: selectedEntry.practiceNotes?.practiceId,
+                          title: selectedEntry.practiceNotes?.practiceTitle,
+                          category: selectedEntry.practiceNotes?.practiceCategory
+                        } as never);
+                      }}
+                      style={[
+                        styles.viewPracticeButton, 
+                        { backgroundColor: getPracticeCategoryColor(selectedEntry.practiceNotes?.practiceCategory) }
+                      ]}
+                    >
+                      View Practice
+                    </Button>
+                  </View>
                 </View>
-              </View>
-              
-              <Divider style={styles.divider} />
-              
-              {/* Sleep & Activity */}
-              <View style={styles.detailSection}>
-                <Text style={styles.detailSectionTitle}>Sleep & Activity</Text>
-                <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Hours of sleep:</Text>
-                  <Text style={styles.detailValue}>{selectedEntry.hoursSlept || 'Not recorded'}</Text>
-                </View>
-                <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Hours of exercise:</Text>
-                  <Text style={styles.detailValue}>{selectedEntry.hoursExercise || 'Not recorded'}</Text>
-                </View>
-                <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Hours of screen time:</Text>
-                  <Text style={styles.detailValue}>{selectedEntry.screenTime || 'Not recorded'}</Text>
-                </View>
-              </View>
-              
-              <Divider style={styles.divider} />
-              
-              {/* Pressures */}
-              <View style={styles.detailSection}>
-                <Text style={styles.detailSectionTitle}>Main Pressures or Concerns</Text>
-                <View style={styles.emotionsContainer}>
-                  {selectedEntry.pressures.length > 0 ? (
-                    selectedEntry.pressures.map((pressure, index) => (
-                      <Chip 
-                        key={index} 
-                        style={styles.detailChip}
-                        textStyle={styles.detailChipText}
-                      >
-                        {pressure}
-                      </Chip>
-                    ))
-                  ) : (
-                    <Text style={styles.noDataText}>No pressures recorded</Text>
-                  )}
-                </View>
-              </View>
-              
-              <Divider style={styles.divider} />
-              
-              {/* People Interactions */}
-              <View style={styles.detailSection}>
-                <Text style={styles.detailSectionTitle}>People You've Engaged With</Text>
-                {selectedEntry.peopleInteractions.some(i => i.person || i.feeling) ? (
-                  selectedEntry.peopleInteractions
-                    .filter(i => i.person || i.feeling)
-                    .map((interaction, index) => (
-                      <View key={index} style={styles.interactionItem}>
-                        <Text style={styles.interactionPerson}>{interaction.person || 'Someone'}</Text>
-                        <Text style={styles.interactionFeeling}>{interaction.feeling || 'No feeling recorded'}</Text>
-                      </View>
-                    ))
-                ) : (
-                  <Text style={styles.noDataText}>No interactions recorded</Text>
-                )}
-              </View>
-              
-              <Divider style={styles.divider} />
-              
-              {/* Wish Said */}
-              <View style={styles.detailSection}>
-                <Text style={styles.detailSectionTitle}>What you wish you said out loud</Text>
-                <Text style={styles.detailText}>
-                  {selectedEntry.wishSaid || 'Nothing recorded'}
-                </Text>
-              </View>
-              
-              <Divider style={styles.divider} />
-              
-              {/* Best/Worst */}
-              <View style={styles.detailSection}>
-                <Text style={styles.detailSectionTitle}>Reflection on Today</Text>
-                <Text style={styles.detailSubtitle}>Best thing you did for yourself:</Text>
-                <Text style={styles.detailText}>
-                  {selectedEntry.bestThing || 'Nothing recorded'}
-                </Text>
-                
-                <Text style={[styles.detailSubtitle, { marginTop: 12 }]}>Worst thing you did for yourself:</Text>
-                <Text style={styles.detailText}>
-                  {selectedEntry.worstThing || 'Nothing recorded'}
-                </Text>
-              </View>
-              
-              <Divider style={styles.divider} />
-              
-              {/* Overall Feeling */}
-              <View style={styles.detailSection}>
-                <Text style={styles.detailSectionTitle}>Overall Feelings</Text>
-                <Text 
-                  style={[
-                    styles.overallFeelingText, 
-                    { color: getOverallFeelingColor(selectedEntry.overallFeeling) }
-                  ]}
-                >
-                  {selectedEntry.overallFeeling || 'Not recorded'}
-                </Text>
-              </View>
-              
-              <Divider style={styles.divider} />
-              
-              {/* Contributing Factors */}
-              <View style={styles.detailSection}>
-                <Text style={styles.detailSectionTitle}>Contributing Factors</Text>
-                {Object.entries(selectedEntry.contributingFactors).map(([level, factors]) => (
-                  <View key={level} style={styles.factorLevel}>
-                    <Text style={styles.factorLevelTitle}>{level}</Text>
-                    {factors.some(f => f) ? (
-                      factors
-                        .filter(f => f)
-                        .map((factor, index) => (
-                          <Text key={index} style={styles.factorText}>• {factor}</Text>
+              ) : (
+                // Regular Journal Entry Content
+                <>
+                  {/* Emotions */}
+                  <View style={styles.detailSection}>
+                    <Text style={styles.detailSectionTitle}>Emotions</Text>
+                    <View style={styles.emotionsContainer}>
+                      {selectedEntry.emotions.length > 0 ? (
+                        selectedEntry.emotions.map((emotion, index) => (
+                          <Chip 
+                            key={index} 
+                            style={styles.detailChip}
+                            textStyle={styles.detailChipText}
+                          >
+                            {emotion}
+                          </Chip>
+                        ))
+                      ) : (
+                        <Text style={styles.noDataText}>No emotions recorded</Text>
+                      )}
+                    </View>
+                  </View>
+                  
+                  <Divider style={styles.divider} />
+                  
+                  {/* Sleep & Activity */}
+                  <View style={styles.detailSection}>
+                    <Text style={styles.detailSectionTitle}>Sleep & Activity</Text>
+                    <View style={styles.detailRow}>
+                      <Text style={styles.detailLabel}>Hours of sleep:</Text>
+                      <Text style={styles.detailValue}>{selectedEntry.hoursSlept || 'Not recorded'}</Text>
+                    </View>
+                    <View style={styles.detailRow}>
+                      <Text style={styles.detailLabel}>Hours of exercise:</Text>
+                      <Text style={styles.detailValue}>{selectedEntry.hoursExercise || 'Not recorded'}</Text>
+                    </View>
+                    <View style={styles.detailRow}>
+                      <Text style={styles.detailLabel}>Hours of screen time:</Text>
+                      <Text style={styles.detailValue}>{selectedEntry.screenTime || 'Not recorded'}</Text>
+                    </View>
+                  </View>
+                  
+                  <Divider style={styles.divider} />
+                  
+                  {/* Pressures */}
+                  <View style={styles.detailSection}>
+                    <Text style={styles.detailSectionTitle}>Main Pressures or Concerns</Text>
+                    <View style={styles.emotionsContainer}>
+                      {selectedEntry.pressures.length > 0 ? (
+                        selectedEntry.pressures.map((pressure, index) => (
+                          <Chip 
+                            key={index} 
+                            style={styles.detailChip}
+                            textStyle={styles.detailChipText}
+                          >
+                            {pressure}
+                          </Chip>
+                        ))
+                      ) : (
+                        <Text style={styles.noDataText}>No pressures recorded</Text>
+                      )}
+                    </View>
+                  </View>
+                  
+                  <Divider style={styles.divider} />
+                  
+                  {/* People Interactions */}
+                  <View style={styles.detailSection}>
+                    <Text style={styles.detailSectionTitle}>People You've Engaged With</Text>
+                    {selectedEntry.peopleInteractions.some(i => i.person || i.feeling) ? (
+                      selectedEntry.peopleInteractions
+                        .filter(i => i.person || i.feeling)
+                        .map((interaction, index) => (
+                          <View key={index} style={styles.interactionItem}>
+                            <Text style={styles.interactionPerson}>{interaction.person || 'Someone'}</Text>
+                            <Text style={styles.interactionFeeling}>{interaction.feeling || 'No feeling recorded'}</Text>
+                          </View>
                         ))
                     ) : (
-                      <Text style={styles.noDataText}>None recorded</Text>
+                      <Text style={styles.noDataText}>No interactions recorded</Text>
                     )}
                   </View>
-                ))}
-              </View>
-              
-              <Divider style={styles.divider} />
-              
-              {/* Current Feeling */}
-              <View style={styles.detailSection}>
-                <Text style={styles.detailSectionTitle}>How you were feeling after journaling</Text>
-                <View style={styles.emotionsContainer}>
-                  {selectedEntry.currentFeeling.length > 0 ? (
-                    selectedEntry.currentFeeling.map((feeling, index) => (
-                      <Chip 
-                        key={index} 
-                        style={styles.detailChip}
-                        textStyle={styles.detailChipText}
-                      >
-                        {feeling}
-                      </Chip>
-                    ))
-                  ) : (
-                    <Text style={styles.noDataText}>No feelings recorded</Text>
-                  )}
-                </View>
-              </View>
-              
-              {/* Notes */}
-              {selectedEntry.notes && (
-                <>
+                  
                   <Divider style={styles.divider} />
+                  
+                  {/* Wish Said */}
                   <View style={styles.detailSection}>
-                    <Text style={styles.detailSectionTitle}>Additional Notes</Text>
-                    <Text style={styles.detailText}>{selectedEntry.notes}</Text>
+                    <Text style={styles.detailSectionTitle}>What you wish you said out loud</Text>
+                    <Text style={styles.detailText}>
+                      {selectedEntry.wishSaid || 'Nothing recorded'}
+                    </Text>
                   </View>
+                  
+                  <Divider style={styles.divider} />
+                  
+                  {/* Best/Worst */}
+                  <View style={styles.detailSection}>
+                    <Text style={styles.detailSectionTitle}>Reflection on Today</Text>
+                    <Text style={styles.detailSubtitle}>Best thing you did for yourself:</Text>
+                    <Text style={styles.detailText}>
+                      {selectedEntry.bestThing || 'Nothing recorded'}
+                    </Text>
+                    
+                    <Text style={[styles.detailSubtitle, { marginTop: 12 }]}>Worst thing you did for yourself:</Text>
+                    <Text style={styles.detailText}>
+                      {selectedEntry.worstThing || 'Nothing recorded'}
+                    </Text>
+                  </View>
+                  
+                  <Divider style={styles.divider} />
+                  
+                  {/* Overall Feeling */}
+                  <View style={styles.detailSection}>
+                    <Text style={styles.detailSectionTitle}>Overall Feelings</Text>
+                    <Text 
+                      style={[
+                        styles.overallFeelingText, 
+                        { color: getOverallFeelingColor(selectedEntry.overallFeeling) }
+                      ]}
+                    >
+                      {selectedEntry.overallFeeling || 'Not recorded'}
+                    </Text>
+                  </View>
+                  
+                  <Divider style={styles.divider} />
+                  
+                  {/* Contributing Factors */}
+                  <View style={styles.detailSection}>
+                    <Text style={styles.detailSectionTitle}>Contributing Factors</Text>
+                    {Object.entries(selectedEntry.contributingFactors).map(([level, factors]) => (
+                      <View key={level} style={styles.factorLevel}>
+                        <Text style={styles.factorLevelTitle}>{level}</Text>
+                        {factors.some(f => f) ? (
+                          factors
+                            .filter(f => f)
+                            .map((factor, index) => (
+                              <Text key={index} style={styles.factorText}>• {factor}</Text>
+                            ))
+                        ) : (
+                          <Text style={styles.noDataText}>None recorded</Text>
+                        )}
+                      </View>
+                    ))}
+                  </View>
+                  
+                  <Divider style={styles.divider} />
+                  
+                  {/* Current Feeling */}
+                  <View style={styles.detailSection}>
+                    <Text style={styles.detailSectionTitle}>How you were feeling after journaling</Text>
+                    <View style={styles.emotionsContainer}>
+                      {selectedEntry.currentFeeling.length > 0 ? (
+                        selectedEntry.currentFeeling.map((feeling, index) => (
+                          <Chip 
+                            key={index} 
+                            style={styles.detailChip}
+                            textStyle={styles.detailChipText}
+                          >
+                            {feeling}
+                          </Chip>
+                        ))
+                      ) : (
+                        <Text style={styles.noDataText}>No feelings recorded</Text>
+                      )}
+                    </View>
+                  </View>
+                  
+                  {/* Notes */}
+                  {selectedEntry.notes && (
+                    <>
+                      <Divider style={styles.divider} />
+                      <View style={styles.detailSection}>
+                        <Text style={styles.detailSectionTitle}>Additional Notes</Text>
+                        <Text style={styles.detailText}>{selectedEntry.notes}</Text>
+                      </View>
+                    </>
+                  )}
                 </>
               )}
             </View>
@@ -615,6 +744,101 @@ const styles = StyleSheet.create({
   },
   divider: {
     marginVertical: 8,
+  },
+  entryHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  
+  practiceEntryCard: {
+    borderLeftWidth: 4,
+    borderLeftColor: COLORS.SERENITY_BLUE,
+  },
+  
+  practiceChip: {
+    height: 28,
+  },
+  
+  practicePreview: {
+    marginTop: 8,
+  },
+  
+  practiceTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  
+  practiceCategory: {
+    fontSize: 14,
+    color: 'rgba(0, 0, 0, 0.6)',
+    marginBottom: 8,
+  },
+  
+  practiceNotesPreview: {
+    fontSize: 14,
+    color: 'rgba(0, 0, 0, 0.8)',
+    fontStyle: 'italic',
+  },
+  
+  practiceNotesDetail: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  
+  practiceHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+  },
+  
+  practiceIcon: {
+    backgroundColor: 'transparent',
+  },
+  
+  practiceHeaderText: {
+    marginLeft: 12,
+  },
+  
+  practiceDetailTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  
+  practiceDetailCategory: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.9)',
+  },
+  
+  practiceNotesContent: {
+    padding: 16,
+  },
+  
+  practiceNotesLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  
+  practiceNotesText: {
+    fontSize: 15,
+    lineHeight: 22,
+    marginBottom: 16,
+  },
+  
+  practiceTimestamp: {
+    fontSize: 12,
+    color: 'rgba(0, 0, 0, 0.6)',
+    marginBottom: 16,
+    fontStyle: 'italic',
+  },
+  
+  viewPracticeButton: {
+    marginTop: 8,
   },
 });
 

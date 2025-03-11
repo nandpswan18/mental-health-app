@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, StatusBar, KeyboardAvoidingView, Platform, TextInput as RNTextInput } from 'react-native';
+import { View, StyleSheet, ScrollView, StatusBar, KeyboardAvoidingView, Platform, TextInput as RNTextInput, Alert } from 'react-native';
 import { Text, Title, Paragraph, IconButton, Surface, Divider, TextInput, Button } from 'react-native-paper';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
+import { format } from 'date-fns';
 
 // Import design system
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../styles/DesignSystem';
@@ -52,7 +54,7 @@ const PracticeDetailScreen = () => {
     loadNotes();
   }, [id]);
   
-  // Save notes to AsyncStorage
+  // Save notes to AsyncStorage and add to journal
   const saveNotes = async () => {
     try {
       setSaving(true);
@@ -62,12 +64,97 @@ const PracticeDetailScreen = () => {
       await AsyncStorage.setItem(`practice_notes_timestamp_${id}`, timestamp);
       setLastSaved(timestamp);
       
+      // Add to journal
+      await addToJournal();
+      
       setTimeout(() => {
         setSaving(false);
       }, 1000);
     } catch (error) {
       console.error('Error saving notes:', error);
       setSaving(false);
+    }
+  };
+  
+  // Add practice notes to journal
+  const addToJournal = async () => {
+    try {
+      if (!notes.trim()) return; // Don't add empty notes
+      
+      // Get existing journal entries
+      const entriesJson = await SecureStore.getItemAsync('journalEntries');
+      let entries = entriesJson ? JSON.parse(entriesJson) : [];
+      
+      // Create a new journal entry
+      const currentDate = new Date();
+      const formattedDate = format(currentDate, "yyyy-MM-dd'T'HH:mm:ss");
+      
+      // Check if we already have an entry for today with this practice
+      const existingEntryIndex = entries.findIndex(
+        (entry: any) => 
+          entry.practiceNotes && 
+          entry.practiceNotes.practiceId === id &&
+          new Date(entry.date).toDateString() === currentDate.toDateString()
+      );
+      
+      if (existingEntryIndex !== -1) {
+        // Update existing entry
+        entries[existingEntryIndex].practiceNotes = {
+          practiceId: id,
+          practiceTitle: title,
+          practiceCategory: category,
+          notes: notes,
+          timestamp: currentDate.toISOString()
+        };
+      } else {
+        // Create a new journal entry specifically for practice notes
+        const newEntry = {
+          id: `practice_${id}_${Date.now()}`,
+          date: formattedDate,
+          emotions: [],
+          hoursSlept: '',
+          hoursExercise: '',
+          screenTime: '',
+          pressures: [],
+          peopleInteractions: [],
+          wishSaid: '',
+          bestThing: '',
+          worstThing: '',
+          overallFeeling: '',
+          contributingFactors: {},
+          currentFeeling: [],
+          notes: `Practice: ${title}`,
+          skippedSections: ['all'],
+          // Add practice-specific data
+          practiceNotes: {
+            practiceId: id,
+            practiceTitle: title,
+            practiceCategory: category,
+            notes: notes,
+            timestamp: currentDate.toISOString()
+          }
+        };
+        
+        entries.push(newEntry);
+      }
+      
+      // Save updated entries
+      await SecureStore.setItemAsync('journalEntries', JSON.stringify(entries));
+      
+      // Show confirmation to user
+      Alert.alert(
+        "Added to Journal",
+        "Your practice notes have been added to your journal history.",
+        [{ text: "OK" }]
+      );
+      
+    } catch (error) {
+      console.error('Error adding to journal:', error);
+      Alert.alert(
+        "Error",
+        "Failed to add notes to journal. Please try again.",
+        [{ text: "OK" }]
+      );
     }
   };
   
