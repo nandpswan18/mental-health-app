@@ -44,12 +44,6 @@ const innerPsychologyResources: PsychologyResource[] = [
     category: 'self-observation'
   },
   {
-    id: '3',
-    title: 'Body Scanning',
-    description: 'Systematically notice physical sensations throughout your body to increase awareness of mind-body connections.',
-    category: 'self-observation'
-  },
-  {
     id: '10',
     title: 'Visualizing Negative Thoughts as Guests',
     description: 'Imagine negative thoughts as guests at a gathering you\'re hosting, observing and engaging with them to understand their purpose and transform your emotional responses.',
