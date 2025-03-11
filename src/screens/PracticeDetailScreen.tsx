@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, StatusBar, KeyboardAvoidingView, Platform, TextInput as RNTextInput, Alert } from 'react-native';
-import { Text, Title, Paragraph, IconButton, Surface, Divider, TextInput, Button, Card } from 'react-native-paper';
+import { Text, Title, Paragraph, IconButton, Surface, Divider, TextInput, Button, Card, DataTable } from 'react-native-paper';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -38,6 +38,13 @@ const PracticeDetailScreen = () => {
   const [uncertaintyText, setUncertaintyText] = useState('');
   const [hasLetGo, setHasLetGo] = useState(false);
   
+  // State for acceptance goals table
+  const [situation, setSituation] = useState('');
+  const [emotionalResponse, setEmotionalResponse] = useState('');
+  const [acceptanceGoal, setAcceptanceGoal] = useState('');
+  const [observations, setObservations] = useState('');
+  const [tableDate, setTableDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  
   // Load saved notes when the screen opens
   useEffect(() => {
     const loadNotes = async () => {
@@ -72,19 +79,90 @@ const PracticeDetailScreen = () => {
       // Add to journal
       await addToJournal();
       
+      // Show confirmation to user
+      Alert.alert(
+        "Added to Journal",
+        "Your practice notes have been added to your journal history.",
+        [{ text: "OK" }]
+      );
+      
       setTimeout(() => {
         setSaving(false);
       }, 1000);
     } catch (error) {
       console.error('Error saving notes:', error);
       setSaving(false);
+      
+      // Show error message
+      Alert.alert(
+        "Error",
+        "Failed to add notes to journal. Please try again.",
+        [{ text: "OK" }]
+      );
     }
   };
   
-  // Add practice notes to journal
-  const addToJournal = async () => {
+  // Save acceptance goals to journal
+  const saveAcceptanceGoals = async () => {
     try {
-      if (!notes.trim()) return; // Don't add empty notes
+      if (!situation.trim() || !emotionalResponse.trim() || !acceptanceGoal.trim()) {
+        Alert.alert('Incomplete Entry', 'Please fill in at least the Situation, Emotional Response, and Acceptance Goal fields.');
+        return;
+      }
+      
+      setSaving(true);
+      
+      // Format the table data as a structured note
+      const formattedNotes = `# Acceptance Journal Entry\n\n` +
+        `**Date:** ${tableDate}\n\n` +
+        `**Situation or Thought:** ${situation}\n\n` +
+        `**Emotional Response:** ${emotionalResponse}\n\n` +
+        `**Acceptance Goal:** ${acceptanceGoal}\n\n` +
+        `**Notes & Observations:** ${observations || 'None'}\n\n` +
+        `---\n\n` +
+        `Remember to regularly revisit this journal, noting any shifts in your emotional responses, and adjust your goals accordingly.`;
+      
+      setNotes(formattedNotes);
+      
+      // Save to AsyncStorage for reference
+      await AsyncStorage.setItem(`acceptance_goals_${id}_${Date.now()}`, JSON.stringify({
+        date: tableDate,
+        situation,
+        emotionalResponse,
+        acceptanceGoal,
+        observations
+      }));
+      
+      // Add to journal
+      await addToJournal(formattedNotes);
+      
+      // Show success message
+      Alert.alert(
+        "Saved to Journal",
+        "Your acceptance goals have been added to your journal history.",
+        [{ text: "OK" }]
+      );
+      
+      // Reset form
+      setSituation('');
+      setEmotionalResponse('');
+      setAcceptanceGoal('');
+      setObservations('');
+      setTableDate(format(new Date(), 'yyyy-MM-dd'));
+      
+      setSaving(false);
+    } catch (error) {
+      console.error('Error saving acceptance goals:', error);
+      setSaving(false);
+      Alert.alert('Error', 'Failed to save your acceptance goals. Please try again.');
+    }
+  };
+  
+  // Modified addToJournal to accept custom notes
+  const addToJournal = async (customNotes = '') => {
+    try {
+      const notesToSave = customNotes || notes;
+      if (!notesToSave.trim()) return; // Don't add empty notes
       
       // Get existing journal entries
       const entriesJson = await SecureStore.getItemAsync('journalEntries');
@@ -108,7 +186,7 @@ const PracticeDetailScreen = () => {
           practiceId: id,
           practiceTitle: title,
           practiceCategory: category,
-          notes: notes,
+          notes: notesToSave,
           timestamp: currentDate.toISOString()
         };
       } else {
@@ -135,7 +213,7 @@ const PracticeDetailScreen = () => {
             practiceId: id,
             practiceTitle: title,
             practiceCategory: category,
-            notes: notes,
+            notes: notesToSave,
             timestamp: currentDate.toISOString()
           }
         };
@@ -146,20 +224,9 @@ const PracticeDetailScreen = () => {
       // Save updated entries
       await SecureStore.setItemAsync('journalEntries', JSON.stringify(entries));
       
-      // Show confirmation to user
-      Alert.alert(
-        "Added to Journal",
-        "Your practice notes have been added to your journal history.",
-        [{ text: "OK" }]
-      );
-      
     } catch (error) {
       console.error('Error adding to journal:', error);
-      Alert.alert(
-        "Error",
-        "Failed to add notes to journal. Please try again.",
-        [{ text: "OK" }]
-      );
+      throw error;
     }
   };
   
@@ -284,8 +351,128 @@ const PracticeDetailScreen = () => {
           </Card>
         )}
         
-        {/* Notes Section (not for id '5') */}
-        {id !== '5' && (
+        {/* Acceptance Goals Table (only for id '6') */}
+        {id === '6' && (
+          <Card style={styles.acceptanceGoalsCard}>
+            <Card.Content>
+              <View style={styles.acceptanceHeader}>
+                <MaterialCommunityIcons name="notebook-outline" size={24} color={getCategoryColor()} />
+                <Text style={styles.acceptanceTitle}>Your Acceptance Journal</Text>
+              </View>
+              
+              <Divider style={styles.acceptanceDivider} />
+              
+              <Text style={styles.acceptancePrompt}>
+                Fill in the table below to document your acceptance practice:
+              </Text>
+              
+              <DataTable style={styles.dataTable}>
+                <DataTable.Header>
+                  <DataTable.Title>Field</DataTable.Title>
+                  <DataTable.Title>Your Entry</DataTable.Title>
+                </DataTable.Header>
+                
+                <DataTable.Row>
+                  <DataTable.Cell>Date</DataTable.Cell>
+                  <DataTable.Cell>
+                    <TextInput
+                      style={styles.tableInput}
+                      mode="outlined"
+                      value={tableDate}
+                      onChangeText={setTableDate}
+                      outlineColor="rgba(0, 0, 0, 0.2)"
+                      activeOutlineColor={getCategoryColor()}
+                      theme={{ colors: { background: '#fff' } }}
+                    />
+                  </DataTable.Cell>
+                </DataTable.Row>
+                
+                <DataTable.Row>
+                  <DataTable.Cell>Situation or Thought</DataTable.Cell>
+                  <DataTable.Cell>
+                    <TextInput
+                      style={styles.tableInput}
+                      mode="outlined"
+                      placeholder="Describe the situation..."
+                      value={situation}
+                      onChangeText={setSituation}
+                      outlineColor="rgba(0, 0, 0, 0.2)"
+                      activeOutlineColor={getCategoryColor()}
+                      theme={{ colors: { background: '#fff' } }}
+                    />
+                  </DataTable.Cell>
+                </DataTable.Row>
+                
+                <DataTable.Row>
+                  <DataTable.Cell>Emotional Response</DataTable.Cell>
+                  <DataTable.Cell>
+                    <TextInput
+                      style={styles.tableInput}
+                      mode="outlined"
+                      placeholder="How did you feel?"
+                      value={emotionalResponse}
+                      onChangeText={setEmotionalResponse}
+                      outlineColor="rgba(0, 0, 0, 0.2)"
+                      activeOutlineColor={getCategoryColor()}
+                      theme={{ colors: { background: '#fff' } }}
+                    />
+                  </DataTable.Cell>
+                </DataTable.Row>
+                
+                <DataTable.Row>
+                  <DataTable.Cell>Acceptance Goal</DataTable.Cell>
+                  <DataTable.Cell>
+                    <TextInput
+                      style={styles.tableInput}
+                      mode="outlined"
+                      placeholder="What's your goal?"
+                      value={acceptanceGoal}
+                      onChangeText={setAcceptanceGoal}
+                      outlineColor="rgba(0, 0, 0, 0.2)"
+                      activeOutlineColor={getCategoryColor()}
+                      theme={{ colors: { background: '#fff' } }}
+                    />
+                  </DataTable.Cell>
+                </DataTable.Row>
+                
+                <DataTable.Row>
+                  <DataTable.Cell>Notes & Observations</DataTable.Cell>
+                  <DataTable.Cell>
+                    <TextInput
+                      style={[styles.tableInput, styles.observationsInput]}
+                      mode="outlined"
+                      placeholder="Additional notes..."
+                      multiline
+                      numberOfLines={3}
+                      value={observations}
+                      onChangeText={setObservations}
+                      outlineColor="rgba(0, 0, 0, 0.2)"
+                      activeOutlineColor={getCategoryColor()}
+                      theme={{ colors: { background: '#fff' } }}
+                    />
+                  </DataTable.Cell>
+                </DataTable.Row>
+              </DataTable>
+              
+              <Button 
+                mode="contained" 
+                onPress={saveAcceptanceGoals} 
+                loading={isSaving}
+                disabled={isSaving}
+                style={[styles.saveButton, { backgroundColor: getCategoryColor() }]}
+              >
+                {isSaving ? 'Saving...' : 'Save to Journal'}
+              </Button>
+              
+              <Text style={styles.acceptanceNote}>
+                Regularly revisit your journal entries to track your progress and adjust your goals as needed.
+              </Text>
+            </Card.Content>
+          </Card>
+        )}
+        
+        {/* Notes Section (not for id '5' or '6') */}
+        {id !== '5' && id !== '6' && (
           <View style={styles.notesContainer}>
             <Text style={styles.notesTitle}>Your Notes</Text>
             <Text style={styles.notesDescription}>
@@ -550,6 +737,40 @@ const getPracticeContent = (id: string) => {
           text: 'By practicing opposite actions, you can break the cycle of negative emotions reinforcing negative behaviors. Over time, this technique can help rewire your brain\'s automatic responses and create new, healthier emotional patterns.'
         }
       ];
+    case '6': // Establishing Personal Acceptance Goals
+      return [
+        {
+          text: 'Setting personal goals around acceptance can transform your daily life, enhancing emotional resilience and psychological flexibility. This practice helps you integrate acceptance into your routine through structured goal-setting and reflection.'
+        },
+        {
+          title: 'Why Set Acceptance Goals?',
+          text: 'Acceptance is not passive resignation but an active choice to acknowledge reality without judgment. By setting specific goals around acceptance, you create a framework for growth that can help you navigate difficult emotions, challenging situations, and uncertain outcomes with greater ease.'
+        },
+        {
+          title: 'Step 1: Identify Areas for Growth',
+          text: 'Begin by identifying areas in your life where you struggle with acceptance. These might include:\n\n• Accepting certain aspects of yourself\n\n• Accepting others\' behaviors or choices\n\n• Accepting circumstances beyond your control\n\n• Accepting past events or mistakes\n\n• Accepting uncertainty about the future'
+        },
+        {
+          title: 'Step 2: Define Clear Goals',
+          text: 'For each area you\'ve identified, define a clear, achievable goal. Effective acceptance goals are:\n\n• Specific: "I will practice accepting my body as it is today" rather than "I will accept myself"\n\n• Measurable: Include ways to track your progress\n\n• Attainable: Start with small steps that feel manageable\n\n• Relevant: Address areas that matter most to you\n\n• Time-bound: Set a timeframe for practice and review'
+        },
+        {
+          title: 'Step 3: Develop a Practice Plan',
+          text: 'Create a concrete plan detailing how you\'ll practice acceptance regularly. This might include:\n\n• Daily mindfulness practices\n\n• Specific affirmations or mantras\n\n• Journaling prompts\n\n• Visualization exercises\n\n• Conversations with a trusted friend or therapist'
+        },
+        {
+          title: 'Step 4: Document Your Journey',
+          text: 'Use the acceptance journal table below to document your experiences. For each entry, record:\n\n• The situation or thought you\'re working to accept\n\n• Your emotional response\n\n• Your specific acceptance goal\n\n• Observations about your experience practicing acceptance'
+        },
+        {
+          title: 'Step 5: Review and Adjust',
+          text: 'Regularly revisit your journal entries to notice patterns, track progress, and adjust your goals as needed. Look for:\n\n• Shifts in your emotional responses over time\n\n• Situations that consistently challenge your acceptance practice\n\n• Strategies that seem particularly helpful\n\n• Areas where you might need additional support'
+        },
+        {
+          title: 'Benefits',
+          text: 'Consistent practice with acceptance goals can help you:\n\n• Reduce emotional suffering\n\n• Increase psychological flexibility\n\n• Improve relationships\n\n• Enhance your ability to focus on what you can control\n\n• Develop greater self-compassion'
+        }
+      ];
     default:
       return [{ text: 'Detailed information for this practice is not available.' }];
   }
@@ -707,6 +928,49 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: SPACING.SMALL,
     color: '#666',
+    textAlign: 'center',
+  },
+  acceptanceGoalsCard: {
+    marginTop: SPACING.LARGE,
+    borderRadius: BORDER_RADIUS.MEDIUM,
+    ...SHADOWS.MEDIUM,
+  },
+  acceptanceHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.SMALL,
+  },
+  acceptanceTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginLeft: SPACING.SMALL,
+    color: '#333',
+  },
+  acceptanceDivider: {
+    marginBottom: SPACING.MEDIUM,
+  },
+  acceptancePrompt: {
+    fontSize: 16,
+    marginBottom: SPACING.MEDIUM,
+    color: '#333',
+  },
+  dataTable: {
+    marginBottom: SPACING.MEDIUM,
+  },
+  tableInput: {
+    backgroundColor: '#fff',
+    fontSize: 14,
+    height: 40,
+    width: '100%',
+  },
+  observationsInput: {
+    minHeight: 80,
+  },
+  acceptanceNote: {
+    fontSize: 14,
+    fontStyle: 'italic',
+    color: '#666',
+    marginTop: SPACING.MEDIUM,
     textAlign: 'center',
   },
 });

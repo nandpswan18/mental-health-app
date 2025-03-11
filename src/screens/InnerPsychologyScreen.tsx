@@ -77,8 +77,8 @@ const innerPsychologyResources: PsychologyResource[] = [
   },
   {
     id: '6',
-    title: 'Letting Go',
-    description: 'Release attachment to specific outcomes and practice accepting life\'s natural flow and impermanence.',
+    title: 'Establishing Personal Acceptance Goals',
+    description: 'Transform your daily life by setting specific acceptance goals, enhancing emotional resilience and psychological flexibility through structured practice.',
     category: 'acceptance'
   },
   
@@ -229,7 +229,7 @@ const InnerPsychologyScreen = () => {
                   <View style={styles.resourceItemContent}>
                     <Text style={styles.resourceItemTitle}>{resource.title}</Text>
                     <Text style={styles.resourceItemDescription}>{resource.description}</Text>
-                    {(resource.id === '1' || resource.id === '2' || resource.id === '4' || resource.id === '5' || resource.id === '10' || resource.id === '11') && (
+                    {(resource.id === '1' || resource.id === '2' || resource.id === '4' || resource.id === '5' || resource.id === '6' || resource.id === '10' || resource.id === '11') && (
                       <View style={styles.newBadge}>
                         <Text style={styles.newBadgeText}>NEW</Text>
                       </View>
