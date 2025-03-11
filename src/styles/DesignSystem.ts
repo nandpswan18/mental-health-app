@@ -30,6 +30,16 @@ export const COLORS = {
   MOOD_NEUTRAL: '#FFD180', // Golden Glow
   MOOD_GOOD: '#C5E1A5', // Light green
   MOOD_GREAT: '#A7D7C5', // Mindful Mint
+  
+  // Darker, Calming Colors
+  DEEP_SERENITY_BLUE: '#5D87C1', // Darker version of Serenity Blue
+  DEEP_MINDFUL_MINT: '#7FB9A2', // Darker version of Mindful Mint
+  DEEP_HOPEFUL_CORAL: '#E06C62', // Darker version of Hopeful Coral
+  DEEP_GOLDEN_GLOW: '#E0B05C', // Darker version of Golden Glow
+  DEEP_CLOUD_GREY: '#E1E9F5', // Slightly darker version of Soft Cloud Grey
+  DEEPER_REFLECTION: '#2C3E50', // Darker, more calming version of Deep Reflection
+  NIGHT_MODE_BG: '#1A2639', // Very dark blue for night mode backgrounds
+  NIGHT_MODE_CARD: '#2C3E50', // Dark blue for cards in night mode
 };
 
 // Typography

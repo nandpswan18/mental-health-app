@@ -174,11 +174,11 @@ const HomeScreen = () => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: COLORS.SOFT_CLOUD_GREY }]}>
+    <View style={[styles.container, { backgroundColor: COLORS.DEEP_CLOUD_GREY }]}>
       <StatusBar style="light" />
       
       {/* Profile Header */}
-      <View style={[styles.header, { paddingTop: insets.top, backgroundColor: COLORS.SERENITY_BLUE }]}>
+      <View style={[styles.header, { paddingTop: insets.top, backgroundColor: COLORS.DEEP_SERENITY_BLUE }]}>
         <View style={styles.headerContent}>
           <View>
             <Text style={styles.greeting}>Good {timeOfDay()},</Text>
@@ -188,8 +188,8 @@ const HomeScreen = () => {
             <Avatar.Text 
               size={50} 
               label={(user?.name?.charAt(0) || 'U') + (user?.name?.split(' ')[1]?.charAt(0) || '')} 
-              style={{ backgroundColor: COLORS.MINDFUL_MINT }}
-              labelStyle={{ color: COLORS.DEEP_REFLECTION }}
+              style={{ backgroundColor: COLORS.DEEP_MINDFUL_MINT }}
+              labelStyle={{ color: COLORS.DEEPER_REFLECTION }}
             />
           </TouchableOpacity>
         </View>
@@ -203,15 +203,15 @@ const HomeScreen = () => {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={[COLORS.SERENITY_BLUE]}
-            tintColor={COLORS.SERENITY_BLUE}
+            colors={[COLORS.DEEP_SERENITY_BLUE]}
+            tintColor={COLORS.DEEP_SERENITY_BLUE}
           />
         }
       >
         {/* Daily Tip Card */}
         <Card style={styles.tipCard}>
           <Card.Content style={styles.tipContent}>
-            <MaterialCommunityIcons name="lightbulb-outline" size={24} color={COLORS.GOLDEN_GLOW} />
+            <MaterialCommunityIcons name="lightbulb-outline" size={24} color={COLORS.DEEP_GOLDEN_GLOW} />
             <View style={styles.tipTextContainer}>
               <Text style={styles.tipTitle}>Daily Tip</Text>
               <Text style={styles.tipText}>{dailyTip}</Text>
@@ -222,7 +222,7 @@ const HomeScreen = () => {
         {/* Current Mood Section */}
         <View style={styles.sectionContainer}>
           <View style={styles.sectionHeader}>
-            <MaterialCommunityIcons name="emoticon-outline" size={24} color={COLORS.DEEP_REFLECTION} />
+            <MaterialCommunityIcons name="emoticon-outline" size={24} color={COLORS.DEEPER_REFLECTION} />
             <Text style={styles.sectionTitle}>How are you feeling today?</Text>
           </View>
           <Card style={styles.card}>
@@ -243,7 +243,7 @@ const HomeScreen = () => {
                     <MaterialCommunityIcons 
                       name={getMoodIcon(mood)} 
                       size={28} 
-                      color={currentMood === mood ? COLORS.WHITE : COLORS.DEEP_REFLECTION} 
+                      color={currentMood === mood ? COLORS.WHITE : COLORS.DEEPER_REFLECTION} 
                     />
                     <Text 
                       style={[
@@ -272,26 +272,26 @@ const HomeScreen = () => {
         {/* Your Journey Section */}
         <View style={styles.sectionContainer}>
           <View style={styles.sectionHeader}>
-            <MaterialCommunityIcons name="chart-timeline-variant" size={24} color={COLORS.DEEP_REFLECTION} />
+            <MaterialCommunityIcons name="chart-timeline-variant" size={24} color={COLORS.DEEPER_REFLECTION} />
             <Text style={styles.sectionTitle}>Your Journey</Text>
           </View>
           <Card style={styles.card}>
             <Card.Content>
               <View style={styles.statsRow}>
                 <View style={styles.statItem}>
-                  <MaterialCommunityIcons name="notebook-outline" size={24} color={COLORS.SERENITY_BLUE} />
+                  <MaterialCommunityIcons name="notebook-outline" size={24} color={COLORS.DEEP_SERENITY_BLUE} />
                   <Text style={styles.statNumber}>{journalCount}</Text>
                   <Text style={styles.statLabel}>Journal Entries</Text>
                 </View>
                 <View style={styles.statDivider} />
                 <View style={styles.statItem}>
-                  <MaterialCommunityIcons name="fire" size={24} color={COLORS.HOPEFUL_CORAL} />
+                  <MaterialCommunityIcons name="fire" size={24} color={COLORS.DEEP_HOPEFUL_CORAL} />
                   <Text style={styles.statNumber}>{streakCount}</Text>
                   <Text style={styles.statLabel}>Day Streak</Text>
                 </View>
                 <View style={styles.statDivider} />
                 <View style={styles.statItem}>
-                  <MaterialCommunityIcons name="calendar-check" size={24} color={COLORS.MINDFUL_MINT} />
+                  <MaterialCommunityIcons name="calendar-check" size={24} color={COLORS.DEEP_MINDFUL_MINT} />
                   <Text style={styles.statDate}>{lastJournalDate ? formatDate(lastJournalDate) : 'Never'}</Text>
                   <Text style={styles.statLabel}>Last Entry</Text>
                 </View>
@@ -300,7 +300,7 @@ const HomeScreen = () => {
               <Button 
                 mode="contained" 
                 onPress={() => navigation.navigate('Journal')}
-                style={styles.journalButton}
+                style={[styles.journalButton, { backgroundColor: COLORS.DEEP_SERENITY_BLUE }]}
                 labelStyle={{ color: COLORS.WHITE }}
                 icon="pencil"
               >
@@ -313,7 +313,7 @@ const HomeScreen = () => {
         {/* Quick Actions Section */}
         <View style={styles.sectionContainer}>
           <View style={styles.sectionHeader}>
-            <MaterialCommunityIcons name="lightning-bolt" size={24} color={COLORS.DEEP_REFLECTION} />
+            <MaterialCommunityIcons name="lightning-bolt" size={24} color={COLORS.DEEPER_REFLECTION} />
             <Text style={styles.sectionTitle}>Quick Actions</Text>
           </View>
           <View style={styles.quickActionsGrid}>
@@ -321,7 +321,7 @@ const HomeScreen = () => {
               style={styles.quickActionCard}
               onPress={() => navigation.navigate('Chat')}
             >
-              <View style={[styles.iconCircle, { backgroundColor: COLORS.SERENITY_BLUE }]}>
+              <View style={[styles.iconCircle, { backgroundColor: COLORS.DEEP_SERENITY_BLUE }]}>
                 <MaterialCommunityIcons name="chat-processing-outline" size={24} color={COLORS.WHITE} />
               </View>
               <Text style={styles.quickActionText}>Chat Support</Text>
@@ -331,7 +331,7 @@ const HomeScreen = () => {
               style={styles.quickActionCard}
               onPress={() => navigation.navigate('Resources')}
             >
-              <View style={[styles.iconCircle, { backgroundColor: COLORS.MINDFUL_MINT }]}>
+              <View style={[styles.iconCircle, { backgroundColor: COLORS.DEEP_MINDFUL_MINT }]}>
                 <MaterialCommunityIcons name="heart-pulse" size={24} color={COLORS.WHITE} />
               </View>
               <Text style={styles.quickActionText}>Resources</Text>
@@ -341,7 +341,7 @@ const HomeScreen = () => {
               style={styles.quickActionCard}
               onPress={() => {/* Start breathing exercise */}}
             >
-              <View style={[styles.iconCircle, { backgroundColor: COLORS.HOPEFUL_CORAL }]}>
+              <View style={[styles.iconCircle, { backgroundColor: COLORS.DEEP_HOPEFUL_CORAL }]}>
                 <MaterialCommunityIcons name="meditation" size={24} color={COLORS.WHITE} />
               </View>
               <Text style={styles.quickActionText}>Breathing</Text>
@@ -351,7 +351,7 @@ const HomeScreen = () => {
               style={styles.quickActionCard}
               onPress={() => navigation.navigate('Profile')}
             >
-              <View style={[styles.iconCircle, { backgroundColor: COLORS.GOLDEN_GLOW }]}>
+              <View style={[styles.iconCircle, { backgroundColor: COLORS.DEEP_GOLDEN_GLOW }]}>
                 <MaterialCommunityIcons name="account-outline" size={24} color={COLORS.WHITE} />
               </View>
               <Text style={styles.quickActionText}>Profile</Text>
@@ -362,14 +362,14 @@ const HomeScreen = () => {
         {/* Mindfulness Exercise */}
         <View style={styles.sectionContainer}>
           <View style={styles.sectionHeader}>
-            <MaterialCommunityIcons name="meditation" size={24} color={COLORS.DEEP_REFLECTION} />
+            <MaterialCommunityIcons name="meditation" size={24} color={COLORS.DEEPER_REFLECTION} />
             <Text style={styles.sectionTitle}>Mindfulness Exercise</Text>
           </View>
           <Card style={styles.card}>
             <Card.Content>
               <View style={styles.mindfulnessHeader}>
                 <Text style={styles.mindfulnessTitle}>2-Minute Breathing Exercise</Text>
-                <Badge style={styles.newBadge}>NEW</Badge>
+                <Badge style={[styles.newBadge, { backgroundColor: COLORS.DEEP_HOPEFUL_CORAL }]}>NEW</Badge>
               </View>
               <Text style={styles.mindfulnessDescription}>
                 Take a moment to breathe deeply. Inhale for 4 counts, hold for 4, and exhale for 6. This simple practice can help reduce stress and increase focus.
@@ -377,7 +377,7 @@ const HomeScreen = () => {
               <Button 
                 mode="contained" 
                 onPress={() => {/* Start breathing exercise */}}
-                style={[styles.mindfulnessButton, { backgroundColor: COLORS.SERENITY_BLUE }]}
+                style={[styles.mindfulnessButton, { backgroundColor: COLORS.DEEP_SERENITY_BLUE }]}
                 labelStyle={{ color: COLORS.WHITE }}
                 icon="play"
               >
@@ -447,12 +447,12 @@ const styles = StyleSheet.create({
   tipTitle: {
     fontSize: TYPOGRAPHY.FONT_SIZE.MEDIUM,
     fontWeight: '700',
-    color: COLORS.DEEP_REFLECTION,
+    color: COLORS.DEEPER_REFLECTION,
     marginBottom: SPACING.TINY,
   },
   tipText: {
     fontSize: TYPOGRAPHY.FONT_SIZE.MEDIUM,
-    color: COLORS.DEEP_REFLECTION,
+    color: COLORS.DEEPER_REFLECTION,
     opacity: 0.8,
   },
   sectionContainer: {
@@ -466,7 +466,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: TYPOGRAPHY.FONT_SIZE.LARGE,
     fontWeight: '700',
-    color: COLORS.DEEP_REFLECTION,
+    color: COLORS.DEEPER_REFLECTION,
     marginLeft: SPACING.SMALL,
   },
   card: {
@@ -483,22 +483,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: SPACING.SMALL,
     borderRadius: BORDER_RADIUS.MEDIUM,
-    backgroundColor: COLORS.SOFT_CLOUD_GREY,
+    backgroundColor: COLORS.DEEP_CLOUD_GREY,
     width: '18%',
   },
   moodText: {
     fontSize: TYPOGRAPHY.FONT_SIZE.TINY,
     marginTop: SPACING.TINY,
-    color: COLORS.DEEP_REFLECTION,
+    color: COLORS.DEEPER_REFLECTION,
   },
   moodFeedback: {
-    backgroundColor: COLORS.SOFT_CLOUD_GREY,
+    backgroundColor: COLORS.DEEP_CLOUD_GREY,
     padding: SPACING.SMALL,
     borderRadius: BORDER_RADIUS.SMALL,
   },
   moodFeedbackText: {
     fontSize: TYPOGRAPHY.FONT_SIZE.SMALL,
-    color: COLORS.DEEP_REFLECTION,
+    color: COLORS.DEEPER_REFLECTION,
   },
   statsRow: {
     flexDirection: 'row',
@@ -512,28 +512,27 @@ const styles = StyleSheet.create({
   },
   statDivider: {
     width: 1,
-    backgroundColor: COLORS.SOFT_CLOUD_GREY,
+    backgroundColor: COLORS.DEEP_CLOUD_GREY,
   },
   statNumber: {
     fontSize: TYPOGRAPHY.FONT_SIZE.XLARGE,
     fontWeight: '700',
-    color: COLORS.DEEP_REFLECTION,
+    color: COLORS.DEEPER_REFLECTION,
     marginVertical: SPACING.TINY,
   },
   statDate: {
     fontSize: TYPOGRAPHY.FONT_SIZE.SMALL,
     fontWeight: '600',
-    color: COLORS.DEEP_REFLECTION,
+    color: COLORS.DEEPER_REFLECTION,
     marginVertical: SPACING.TINY,
     textAlign: 'center',
   },
   statLabel: {
     fontSize: TYPOGRAPHY.FONT_SIZE.SMALL,
-    color: COLORS.DEEP_REFLECTION,
+    color: COLORS.DEEPER_REFLECTION,
     opacity: 0.7,
   },
   journalButton: {
-    backgroundColor: COLORS.SERENITY_BLUE,
     borderRadius: BORDER_RADIUS.MEDIUM,
   },
   quickActionsGrid: {
@@ -560,7 +559,7 @@ const styles = StyleSheet.create({
   },
   quickActionText: {
     fontSize: TYPOGRAPHY.FONT_SIZE.MEDIUM,
-    color: COLORS.DEEP_REFLECTION,
+    color: COLORS.DEEPER_REFLECTION,
     fontWeight: '500',
   },
   mindfulnessHeader: {
@@ -572,14 +571,14 @@ const styles = StyleSheet.create({
   mindfulnessTitle: {
     fontSize: TYPOGRAPHY.FONT_SIZE.LARGE,
     fontWeight: '600',
-    color: COLORS.DEEP_REFLECTION,
+    color: COLORS.DEEPER_REFLECTION,
   },
   newBadge: {
-    backgroundColor: COLORS.HOPEFUL_CORAL,
+    backgroundColor: COLORS.DEEP_HOPEFUL_CORAL,
   },
   mindfulnessDescription: {
     fontSize: TYPOGRAPHY.FONT_SIZE.MEDIUM,
-    color: COLORS.DEEP_REFLECTION,
+    color: COLORS.DEEPER_REFLECTION,
     opacity: 0.8,
     marginBottom: SPACING.MEDIUM,
     lineHeight: 22,
