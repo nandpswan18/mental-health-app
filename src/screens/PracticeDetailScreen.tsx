@@ -1,8 +1,9 @@
-import React from 'react';
-import { View, StyleSheet, ScrollView, StatusBar } from 'react-native';
-import { Text, Title, Paragraph, IconButton, Surface, Divider } from 'react-native-paper';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, ScrollView, StatusBar, KeyboardAvoidingView, Platform, TextInput as RNTextInput } from 'react-native';
+import { Text, Title, Paragraph, IconButton, Surface, Divider, TextInput, Button } from 'react-native-paper';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Import design system
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../styles/DesignSystem';
@@ -25,6 +26,51 @@ const PracticeDetailScreen = () => {
   
   const { id, title, category } = route.params;
   
+  // State for user notes
+  const [notes, setNotes] = useState('');
+  const [isSaving, setSaving] = useState(false);
+  const [lastSaved, setLastSaved] = useState<string | null>(null);
+  
+  // Load saved notes when the screen opens
+  useEffect(() => {
+    const loadNotes = async () => {
+      try {
+        const savedNotes = await AsyncStorage.getItem(`practice_notes_${id}`);
+        if (savedNotes) {
+          setNotes(savedNotes);
+        }
+        
+        const savedTimestamp = await AsyncStorage.getItem(`practice_notes_timestamp_${id}`);
+        if (savedTimestamp) {
+          setLastSaved(savedTimestamp);
+        }
+      } catch (error) {
+        console.error('Error loading notes:', error);
+      }
+    };
+    
+    loadNotes();
+  }, [id]);
+  
+  // Save notes to AsyncStorage
+  const saveNotes = async () => {
+    try {
+      setSaving(true);
+      await AsyncStorage.setItem(`practice_notes_${id}`, notes);
+      
+      const timestamp = new Date().toLocaleString();
+      await AsyncStorage.setItem(`practice_notes_timestamp_${id}`, timestamp);
+      setLastSaved(timestamp);
+      
+      setTimeout(() => {
+        setSaving(false);
+      }, 1000);
+    } catch (error) {
+      console.error('Error saving notes:', error);
+      setSaving(false);
+    }
+  };
+  
   // Get the practice content based on the ID
   const practiceContent = getPracticeContent(id);
   
@@ -43,7 +89,11 @@ const PracticeDetailScreen = () => {
   };
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <KeyboardAvoidingView 
+      style={[styles.container, { paddingTop: insets.top }]}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
+    >
       <StatusBar barStyle="light-content" />
       
       {/* Header */}
@@ -79,8 +129,45 @@ const PracticeDetailScreen = () => {
             </View>
           ))}
         </View>
+        
+        {/* Notes Section */}
+        <View style={styles.notesContainer}>
+          <Text style={styles.notesTitle}>Your Notes</Text>
+          <Text style={styles.notesDescription}>
+            Record your thoughts and feelings about this practice. How did it help you? What did you notice during the exercise?
+          </Text>
+          
+          <TextInput
+            style={styles.notesInput}
+            multiline
+            mode="outlined"
+            placeholder="Write your notes here..."
+            value={notes}
+            onChangeText={setNotes}
+            outlineColor="rgba(255, 255, 255, 0.2)"
+            activeOutlineColor={getCategoryColor()}
+            textColor="rgba(255, 255, 255, 0.9)"
+            placeholderTextColor="rgba(255, 255, 255, 0.5)"
+            theme={{ colors: { background: '#1A2A4A' } }}
+          />
+          
+          <View style={styles.saveContainer}>
+            {lastSaved && (
+              <Text style={styles.lastSavedText}>Last saved: {lastSaved}</Text>
+            )}
+            <Button 
+              mode="contained" 
+              onPress={saveNotes} 
+              loading={isSaving}
+              disabled={isSaving}
+              style={[styles.saveButton, { backgroundColor: getCategoryColor() }]}
+            >
+              {isSaving ? 'Saving...' : 'Save Notes'}
+            </Button>
+          </View>
+        </View>
       </ScrollView>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -174,7 +261,46 @@ const styles = StyleSheet.create({
   divider: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     marginVertical: SPACING.MEDIUM,
-  }
+  },
+  notesContainer: {
+    backgroundColor: '#1A2A4A',
+    borderRadius: BORDER_RADIUS.MEDIUM,
+    padding: SPACING.MEDIUM,
+    marginTop: SPACING.LARGE,
+    ...SHADOWS.MEDIUM,
+  },
+  notesTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.WHITE,
+    marginBottom: SPACING.SMALL,
+  },
+  notesDescription: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.7)',
+    marginBottom: SPACING.MEDIUM,
+    lineHeight: 20,
+  },
+  notesInput: {
+    minHeight: 150,
+    backgroundColor: '#1A2A4A',
+    fontSize: 16,
+    lineHeight: 24,
+    marginBottom: SPACING.MEDIUM,
+  },
+  saveContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  lastSavedText: {
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.5)',
+    flex: 1,
+  },
+  saveButton: {
+    borderRadius: BORDER_RADIUS.SMALL,
+  },
 });
 
 export default PracticeDetailScreen; 
