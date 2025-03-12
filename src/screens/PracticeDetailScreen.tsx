@@ -710,31 +710,119 @@ const getPracticeContent = (id: string) => {
     case '11': // Practicing Opposite Actions
       return [
         {
-          text: 'Opposite action is an effective technique where you intentionally perform the reverse of what your emotions or negative thoughts urge you to do, helping you avoid unhelpful outcomes and break negative patterns of behavior.'
+          text: 'When negative emotions or thoughts arise, they often urge us to act in ways that can be unhelpful or even harmful. This practice involves intentionally doing the opposite of what your emotion or thought is telling you to do, helping you avoid unhelpful outcomes and transform your emotional responses.'
         },
         {
-          title: 'Step 1: Identify',
-          text: 'Identify a frequent negative thought or emotion you experience, such as anxiety, self-criticism, or frustration. Notice when this thought arises and what it typically makes you want to do.'
+          title: 'How It Works',
+          text: 'Opposite action works by breaking the cycle between thoughts, emotions, and behaviors. When we act differently than our emotions urge us to, we create new neural pathways and experiences that can change how we feel.'
         },
         {
-          title: 'Step 2: Define the Opposite',
-          text: 'Clearly define an action that is directly opposite to what this thought or emotion typically motivates you to do.\n\n• If anxiety makes you want to avoid social situations, the opposite action is to engage socially.\n\n• If self-criticism makes you focus on flaws, the opposite is to list your strengths and achievements.\n\n• If frustration makes you want to give up, the opposite is to break the task into smaller steps and continue.'
+          title: 'Step 1: Identify the Emotion and Action Urge',
+          text: 'Notice what you\'re feeling and what this emotion is telling you to do. For example:\n\n• Anxiety might urge you to avoid a situation\n\n• Anger might urge you to attack or criticize\n\n• Sadness might urge you to withdraw or isolate yourself\n\n• Shame might urge you to hide or conceal parts of yourself'
         },
         {
-          title: 'Step 3: Practice',
-          text: 'Whenever the negative thought or emotion emerges, consciously practice the opposite action you\'ve identified. This may feel uncomfortable at first, but this discomfort is part of the growth process.'
+          title: 'Step 2: Consider the Consequences',
+          text: 'Ask yourself: "If I follow this urge, will it help or harm my relationships, goals, or well-being in the long run?" If the answer is that it would be harmful or unhelpful, this is a good candidate for opposite action.'
         },
         {
-          title: 'Step 4: Reflect',
-          text: 'After completing the opposite action, reflect on how it affects your emotions and thought processes. Notice any shifts in your mood, perspective, or physical sensations.'
+          title: 'Step 3: Identify the Opposite Action',
+          text: 'Determine what the opposite of your urge would be. For example:\n\n• Instead of avoiding what makes you anxious, approach it gradually\n\n• Instead of attacking when angry, practice gentle assertiveness or temporarily step away\n\n• Instead of isolating when sad, reach out to someone supportive\n\n• Instead of hiding when ashamed, share your experience with someone trustworthy'
         },
         {
-          title: 'Example',
-          text: 'If you often think "I am not good enough," your opposite action could be to list three personal achievements or positive attributes about yourself, speak them aloud, and accept a compliment without deflecting it.'
+          title: 'Step 4: Commit Fully to the Action',
+          text: 'Engage in the opposite action wholeheartedly, with your full posture, facial expression, tone of voice, and thoughts aligned with the new action. Half-hearted opposite actions are less effective.'
         },
         {
-          title: 'Benefit',
-          text: 'By practicing opposite actions, you can break the cycle of negative emotions reinforcing negative behaviors. Over time, this technique can help rewire your brain\'s automatic responses and create new, healthier emotional patterns.'
+          title: 'Step 5: Repeat as Needed',
+          text: 'You may need to practice the opposite action multiple times before noticing a shift in your emotions. Be patient and persistent.'
+        },
+        {
+          title: 'Examples',
+          text: '• When feeling anxious about a social event and wanting to cancel, the opposite action is to attend while using calming techniques\n\n• When feeling irritated with your partner and wanting to make a cutting remark, the opposite action is to take a deep breath and express your needs respectfully\n\n• When feeling down and wanting to stay in bed all day, the opposite action is to get up, shower, and engage in a small pleasant activity'
+        },
+        {
+          title: 'Important Note',
+          text: 'Opposite action is not appropriate for all situations. It works best for emotions that don\'t fit the facts or aren\'t helpful in the current context. If your emotion is justified and acting on it would be beneficial, then it\'s better to honor that emotion.'
+        },
+        {
+          title: 'Benefits',
+          text: 'Regular practice of opposite action can help you:\n\n• Break unhelpful emotional patterns\n\n• Build confidence in your ability to manage difficult emotions\n\n• Create new, more positive experiences that can change how you feel\n\n• Develop greater emotional flexibility and resilience'
+        }
+      ];
+    case '12': // 5-4-3-2-1 Technique
+      return [
+        {
+          text: 'The 5-4-3-2-1 technique is a powerful grounding exercise that uses all five senses to anchor you in the present moment. This practice is particularly helpful during times of anxiety, stress, or when your mind is racing with worries about the past or future.'
+        },
+        {
+          title: 'When to Use This Technique',
+          text: 'This technique is especially useful when you:\n\n• Feel overwhelmed by anxiety or stress\n\n• Experience racing thoughts or worry\n\n• Feel disconnected from your surroundings\n\n• Need to quickly regain focus and presence\n\n• Are experiencing a panic attack or heightened anxiety'
+        },
+        {
+          title: 'Step 1: Identify Five Things You Can See',
+          text: 'Start by identifying five things you can see around you. Look for small details you might not usually notice, like a pattern on the wall, the way light reflects off a surface, or the exact color of an object. Name each item either silently to yourself or out loud.'
+        },
+        {
+          title: 'Step 2: Touch Four Objects Around You',
+          text: 'Next, touch four objects nearby. Notice how each one feels against your fingertips. Is it smooth, rough, warm, cool, soft, or hard? Focus on the texture and physical sensations, allowing yourself to be fully present with each touch.'
+        },
+        {
+          title: 'Step 3: Listen for Three Distinct Sounds',
+          text: 'Now, tune in to three sounds in your environment. This might be the hum of an appliance, birds outside, the sound of your own breathing, or distant conversations. Try to separate each sound and focus on it individually for a moment.'
+        },
+        {
+          title: 'Step 4: Identify Two Scents',
+          text: 'Become aware of two things you can smell. If you can\'t immediately identify any scents, you can move to an area with more noticeable smells (like a kitchen or garden), or briefly smell something familiar like a book, piece of clothing, or your own skin.'
+        },
+        {
+          title: 'Step 5: Notice One Taste',
+          text: 'Finally, notice one thing you can taste. This might be the lingering taste of your last meal, your toothpaste, or simply the taste in your mouth. If you can\'t identify a taste, you can take a small sip of water or touch your tongue to your lips.'
+        },
+        {
+          title: 'Practice Tips',
+          text: '• Move through the steps slowly, spending at least a few moments with each sense\n\n• If you\'re in a situation where you can\'t physically touch objects, you can visualize touching them instead\n\n• The order (5-4-3-2-1) helps you remember the sequence, but you can adapt it if needed\n\n• Practice regularly, even when you\'re not feeling anxious, to strengthen your ability to use this technique when needed'
+        },
+        {
+          title: 'Benefits',
+          text: 'Regular practice of the 5-4-3-2-1 technique can help:\n\n• Interrupt anxiety cycles and racing thoughts\n\n• Bring your awareness back to the present moment\n\n• Activate the parasympathetic nervous system, which helps calm the body\'s stress response\n\n• Improve your ability to focus and concentrate\n\n• Provide a portable coping skill you can use anywhere, anytime'
+        }
+      ];
+    case '13': // Mental Check-In
+      return [
+        {
+          text: 'A mental check-in is a simple yet powerful practice that helps you pause and assess your current mental and emotional state. By regularly checking in with yourself, you can develop greater self-awareness, identify patterns in your thoughts and feelings, and respond to your needs more effectively.'
+        },
+        {
+          title: 'When to Practice',
+          text: 'Mental check-ins can be done at any time, but they\'re particularly valuable:\n\n• At the beginning and end of each day\n\n• During transitions between activities\n\n• When you notice a shift in your mood or energy\n\n• Before important conversations or decisions\n\n• When you feel overwhelmed, stressed, or disconnected'
+        },
+        {
+          title: 'Step 1: Find a Quiet Space',
+          text: 'Find a quiet, comfortable space where you won\'t be disturbed for a few minutes. This could be a physical space or simply a mental pause in your current environment.'
+        },
+        {
+          title: 'Step 2: Take a Few Centering Breaths',
+          text: 'Take several slow, deep breaths to center yourself. Breathe in through your nose for a count of four, hold briefly, and exhale through your mouth for a count of six. Allow your body to relax with each exhale.'
+        },
+        {
+          title: 'Step 3: Ask Yourself Key Questions',
+          text: 'Gently ask yourself the following questions, allowing honest answers to emerge without judgment:\n\n• How am I feeling at this moment?\n\n• What emotions do I notice in my mind and body?\n\n• Have I been attentive to my physical and emotional well-being?\n\n• Do my current daily activities provide me with a sense of fulfillment?\n\n• Have I recently experienced symptoms of stress or anxiety?'
+        },
+        {
+          title: 'Step 4: Reflect Without Judgment',
+          text: 'Reflect on your answers honestly, without self-judgment. Acknowledge your emotions openly, recognizing that all feelings are valid information, not problems to be solved. Notice any patterns or insights that emerge.'
+        },
+        {
+          title: 'Step 5: Choose a Supportive Action',
+          text: 'Based on your reflections, choose one small, positive action to support your mental well-being. This might be:\n\n• Taking a short break if you\'re feeling overwhelmed\n\n• Reaching out to a friend if you\'re feeling isolated\n\n• Practicing a brief relaxation technique if you\'re feeling anxious\n\n• Setting a boundary if you\'re feeling depleted\n\n• Expressing gratitude if you\'re feeling disconnected'
+        },
+        {
+          title: 'Practice Example',
+          text: 'During a mental check-in, you might notice that you\'re feeling tense and irritable. Upon reflection, you realize you\'ve been working for several hours without a break and haven\'t eaten lunch. Your supportive action might be to pause your work, eat a nourishing meal, and take a short walk before returning to your tasks.'
+        },
+        {
+          title: 'Benefits',
+          text: 'Regular mental check-ins can help you:\n\n• Catch stress and overwhelm before they escalate\n\n• Identify patterns in your emotional responses\n\n• Develop greater emotional intelligence and self-awareness\n\n• Make choices that better support your well-being\n\n• Cultivate a more compassionate relationship with yourself'
         }
       ];
     case '6': // Personal Acceptance Goals
@@ -772,7 +860,11 @@ const getPracticeContent = (id: string) => {
         }
       ];
     default:
-      return [{ text: 'Detailed information for this practice is not available.' }];
+      return [
+        {
+          text: 'Content for this practice is coming soon. Please check back later.'
+        }
+      ];
   }
 };
 

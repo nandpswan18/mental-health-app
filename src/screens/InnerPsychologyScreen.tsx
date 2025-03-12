@@ -94,6 +94,18 @@ const innerPsychologyResources: PsychologyResource[] = [
     title: 'Mindful Activities',
     description: 'Bring full attention to everyday activities like eating, walking, or washing dishes, experiencing them with all your senses.',
     category: 'present-moment'
+  },
+  {
+    id: '12',
+    title: '5-4-3-2-1 Technique',
+    description: 'A structured grounding exercise that engages all five senses to anchor you in the present moment and reduce anxiety or stress.',
+    category: 'present-moment'
+  },
+  {
+    id: '13',
+    title: 'Mental Check-In',
+    description: 'A simple practice to pause and assess your mental and emotional state, helping you reflect on your feelings and thoughts without judgment.',
+    category: 'present-moment'
   }
 ];
 
