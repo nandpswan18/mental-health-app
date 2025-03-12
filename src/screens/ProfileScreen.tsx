@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, TextInput, Linking, Platform } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, TextInput, Linking, Platform, Dimensions, Animated } from 'react-native';
 import { 
   Text, 
   Card, 
@@ -16,12 +16,14 @@ import {
   Badge,
   Portal,
   Dialog,
-  FAB
+  FAB,
+  ProgressBar
 } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import * as SecureStore from 'expo-secure-store';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { useAuth } from '../contexts/AuthContext';
 // Import our design system
@@ -112,6 +114,38 @@ const ProfileScreen = () => {
   const [darkModeEnabled, setDarkModeEnabled] = useState(false);
   const [journalEntryCount, setJournalEntryCount] = useState(0);
   const [lastJournalDate, setLastJournalDate] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'settings'>('overview');
+  const [refreshing, setRefreshing] = useState(false);
+  
+  // Animation refs
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const headerHeight = scrollY.interpolate({
+    inputRange: [0, 100],
+    outputRange: [200, 80],
+    extrapolate: 'clamp',
+  });
+  
+  const headerOpacity = scrollY.interpolate({
+    inputRange: [0, 60, 90],
+    outputRange: [1, 0.3, 0],
+    extrapolate: 'clamp',
+  });
+  
+  const contentOpacity = scrollY.interpolate({
+    inputRange: [0, 60, 90],
+    outputRange: [0, 0.7, 1],
+    extrapolate: 'clamp',
+  });
+  
+  // Analytics data
+  const [weeklyMoodData, setWeeklyMoodData] = useState(moodData);
+  const [practiceStats, setPracticeStats] = useState({
+    sessions: 12,
+    streak: 5,
+    practices: 8,
+    minutesTotal: 240,
+    completionRate: 0.78,
+  });
   
   // Emergency contacts state
   const [emergencyContacts, setEmergencyContacts] = useState<EmergencyContact[]>([]);
@@ -530,206 +564,375 @@ const ProfileScreen = () => {
     );
   };
 
-  return (
-    <ScrollView 
-      style={[styles.container, { backgroundColor: COLORS.SOFT_CLOUD_GREY }]}
-      contentContainerStyle={styles.contentContainer}
-    >
-      <View style={styles.header}>
-        <Avatar.Text 
-          size={80} 
-          label={user?.name?.substring(0, 2) || 'U'} 
-          style={styles.avatar}
-          color={COLORS.DEEP_REFLECTION}
-        />
-        <Title 
-          style={styles.name}
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          {user?.name || 'User'}
-        </Title>
-        <Paragraph 
-          style={styles.email}
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          {user?.email || 'user@example.com'}
-        </Paragraph>
-      </View>
-
-      {/* Quick Actions */}
-      <View style={styles.quickActions}>
-        <TouchableOpacity 
-          style={styles.quickAction}
-          onPress={navigateToJournal}
-        >
-          <Surface style={styles.quickActionIcon}>
-            <MaterialCommunityIcons name="pencil-plus" size={24} color={COLORS.WHITE} />
-          </Surface>
-          <Text style={styles.quickActionText}>New Journal</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={styles.quickAction}
-          onPress={navigateToJournalHistory}
-        >
-          <Surface style={styles.quickActionIcon}>
-            <MaterialCommunityIcons name="history" size={24} color={COLORS.WHITE} />
-            {journalEntryCount > 0 && (
-              <Badge style={styles.badge}>{journalEntryCount}</Badge>
-            )}
-          </Surface>
-          <Text style={styles.quickActionText}>Journal History</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={styles.quickAction}
-          onPress={navigateToProfileSetup}
-        >
-          <Surface style={styles.quickActionIcon}>
-            <MaterialCommunityIcons name="account-edit" size={24} color={COLORS.WHITE} />
-          </Surface>
-          <Text style={styles.quickActionText}>Edit Profile</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Emergency Contacts Section */}
-      {renderEmergencyContactsSection()}
-
-      {/* Journal Status Card */}
-      <Card style={styles.card}>
-        <Card.Content>
-          <View style={styles.cardHeader}>
-            <Title style={{ color: COLORS.DEEP_REFLECTION }}>Mental State Journal</Title>
-            <IconButton 
-              icon="arrow-right" 
-              size={20} 
-              onPress={navigateToJournalHistory}
-              iconColor={COLORS.SERENITY_BLUE}
-            />
-          </View>
+  // Render overview tab content
+  const renderOverviewTab = () => {
+    return (
+      <View style={styles.tabContent}>
+        {/* Quick Actions */}
+        <View style={styles.quickActions}>
+          <TouchableOpacity 
+            style={styles.quickAction}
+            onPress={navigateToJournal}
+          >
+            <Surface style={styles.quickActionIcon}>
+              <MaterialCommunityIcons name="pencil-plus" size={24} color={COLORS.WHITE} />
+            </Surface>
+            <Text style={styles.quickActionText}>New Journal</Text>
+          </TouchableOpacity>
           
-          <View style={styles.journalStatus}>
-            <View style={styles.journalStatusItem}>
-              <Text style={[styles.journalStatusLabel, { color: COLORS.DEEP_REFLECTION }]}>Total Entries</Text>
-              <Text style={[styles.journalStatusValue, { color: COLORS.SERENITY_BLUE }]}>
-                {journalEntryCount}
-              </Text>
+          <TouchableOpacity 
+            style={styles.quickAction}
+            onPress={navigateToJournalHistory}
+          >
+            <Surface style={styles.quickActionIcon}>
+              <MaterialCommunityIcons name="history" size={24} color={COLORS.WHITE} />
+              {journalEntryCount > 0 && (
+                <Badge style={styles.badge}>{journalEntryCount}</Badge>
+              )}
+            </Surface>
+            <Text style={styles.quickActionText}>Journal History</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.quickAction}
+            onPress={navigateToProfileSetup}
+          >
+            <Surface style={styles.quickActionIcon}>
+              <MaterialCommunityIcons name="account-edit" size={24} color={COLORS.WHITE} />
+            </Surface>
+            <Text style={styles.quickActionText}>Edit Profile</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Emergency Contacts Section */}
+        {renderEmergencyContactsSection()}
+
+        {/* Journal Status Card */}
+        <Card style={styles.card}>
+          <Card.Content>
+            <View style={styles.cardHeader}>
+              <Title style={{ color: COLORS.DEEP_REFLECTION }}>Mental State Journal</Title>
+              <IconButton 
+                icon="arrow-right" 
+                size={20} 
+                onPress={navigateToJournalHistory}
+                iconColor={COLORS.SERENITY_BLUE}
+              />
             </View>
             
-            <View style={styles.journalStatusItem}>
-              <Text style={[styles.journalStatusLabel, { color: COLORS.DEEP_REFLECTION }]}>Last Entry</Text>
-              <Text style={[styles.journalStatusValue, { color: COLORS.DEEP_REFLECTION }]}>
-                {formatDate(lastJournalDate)}
-              </Text>
+            <View style={styles.journalStatus}>
+              <View style={styles.journalStatusItem}>
+                <Text style={[styles.journalStatusLabel, { color: COLORS.DEEP_REFLECTION }]}>Total Entries</Text>
+                <Text style={[styles.journalStatusValue, { color: COLORS.SERENITY_BLUE }]}>
+                  {journalEntryCount}
+                </Text>
+              </View>
+              
+              <View style={styles.journalStatusItem}>
+                <Text style={[styles.journalStatusLabel, { color: COLORS.DEEP_REFLECTION }]}>Last Entry</Text>
+                <Text style={[styles.journalStatusValue, { color: COLORS.DEEP_REFLECTION }]}>
+                  {formatDate(lastJournalDate)}
+                </Text>
+              </View>
             </View>
-          </View>
-          
-          <Button 
-            mode="contained" 
-            onPress={navigateToJournal}
-            style={[styles.journalButton, { backgroundColor: COLORS.SERENITY_BLUE }]}
-            icon="pencil"
-          >
-            New Journal Entry
-          </Button>
-        </Card.Content>
-      </Card>
+            
+            <Button 
+              mode="contained" 
+              onPress={navigateToJournal}
+              style={[styles.journalButton, { backgroundColor: COLORS.SERENITY_BLUE }]}
+              icon="pencil"
+            >
+              New Journal Entry
+            </Button>
+          </Card.Content>
+        </Card>
 
-      <Card style={styles.card}>
-        <Card.Content>
-          <View style={styles.cardHeader}>
-            <Title style={{ color: COLORS.DEEP_REFLECTION }}>Mindfulness Journey</Title>
-            <IconButton 
-              icon="information-outline" 
-              size={20} 
-              onPress={() => {}}
-              iconColor={COLORS.SERENITY_BLUE}
+        {/* Crisis Resources Section */}
+        {renderCrisisResourcesSection()}
+      </View>
+    );
+  };
+
+  // Render analytics tab content
+  const renderAnalyticsTab = () => {
+    return (
+      <View style={styles.tabContent}>
+        <Card style={styles.card}>
+          <Card.Content>
+            <View style={styles.cardHeader}>
+              <Title style={{ color: COLORS.DEEP_REFLECTION }}>Mindfulness Journey</Title>
+              <IconButton 
+                icon="information-outline" 
+                size={20} 
+                onPress={() => {}}
+                iconColor={COLORS.SERENITY_BLUE}
+              />
+            </View>
+            <Paragraph style={{ color: COLORS.DEEP_REFLECTION, opacity: 0.7, marginBottom: SPACING.SMALL }}>
+              Track your emotional landscape this week
+            </Paragraph>
+            {renderMoodGraph()}
+          </Card.Content>
+        </Card>
+
+        <Card style={styles.card}>
+          <Card.Content>
+            <Title style={{ color: COLORS.DEEP_REFLECTION }}>Practice Insights</Title>
+            <View style={styles.statsContainer}>
+              <View style={styles.stat}>
+                <Text style={[styles.statNumber, { color: COLORS.SERENITY_BLUE }]}>{practiceStats.sessions}</Text>
+                <Text style={[styles.statLabel, { color: COLORS.DEEP_REFLECTION }]}>Sessions</Text>
+              </View>
+              <View style={styles.stat}>
+                <Text style={[styles.statNumber, { color: COLORS.SERENITY_BLUE }]}>{practiceStats.streak}</Text>
+                <Text style={[styles.statLabel, { color: COLORS.DEEP_REFLECTION }]}>Day Streak</Text>
+              </View>
+              <View style={styles.stat}>
+                <Text style={[styles.statNumber, { color: COLORS.SERENITY_BLUE }]}>{practiceStats.practices}</Text>
+                <Text style={[styles.statLabel, { color: COLORS.DEEP_REFLECTION }]}>Practices</Text>
+              </View>
+            </View>
+          </Card.Content>
+        </Card>
+
+        <Card style={styles.card}>
+          <Card.Content>
+            <Title style={{ color: COLORS.DEEP_REFLECTION }}>Completion Rate</Title>
+            <View style={styles.progressContainer}>
+              <Text style={styles.progressText}>{Math.round(practiceStats.completionRate * 100)}%</Text>
+              <ProgressBar 
+                progress={practiceStats.completionRate} 
+                color={COLORS.SERENITY_BLUE} 
+                style={styles.progressBar} 
+              />
+              <Text style={styles.progressLabel}>Practice Completion</Text>
+            </View>
+          </Card.Content>
+        </Card>
+
+        <Card style={styles.card}>
+          <Card.Content>
+            <Title style={{ color: COLORS.DEEP_REFLECTION }}>Total Mindfulness Time</Title>
+            <View style={styles.timeContainer}>
+              <Text style={styles.timeValue}>{practiceStats.minutesTotal}</Text>
+              <Text style={styles.timeLabel}>minutes</Text>
+            </View>
+          </Card.Content>
+        </Card>
+      </View>
+    );
+  };
+
+  // Render settings tab content
+  const renderSettingsTab = () => {
+    return (
+      <View style={styles.tabContent}>
+        <Card style={styles.card}>
+          <Card.Content>
+            <Title>Preferences</Title>
+            <List.Item
+              title="Mindfulness Reminders"
+              description="Receive gentle daily reminders"
+              left={props => <List.Icon {...props} icon="bell-outline" />}
+              right={() => (
+                <Switch
+                  value={notificationsEnabled}
+                  onValueChange={setNotificationsEnabled}
+                  color={theme.colors.primary}
+                />
+              )}
             />
+            <Divider />
+            <List.Item
+              title="Night Mode"
+              description="Use softer colors in the evening"
+              left={props => <List.Icon {...props} icon="weather-night" />}
+              right={() => (
+                <Switch
+                  value={darkModeEnabled}
+                  onValueChange={setDarkModeEnabled}
+                  color={theme.colors.primary}
+                />
+              )}
+            />
+            <Divider />
+            <List.Item
+              title="Privacy Settings"
+              description="Manage your data and privacy"
+              left={props => <List.Icon {...props} icon="shield-account" />}
+              right={props => <List.Icon {...props} icon="chevron-right" />}
+            />
+            <Divider />
+            <List.Item
+              title="About This App"
+              description="Learn more about our approach"
+              left={props => <List.Icon {...props} icon="information" />}
+              right={props => <List.Icon {...props} icon="chevron-right" />}
+            />
+          </Card.Content>
+        </Card>
+
+        <Button 
+          mode="outlined" 
+          onPress={signOut}
+          style={[styles.signOutButton, { borderColor: theme.colors.primary }]}
+          color={theme.colors.primary}
+          icon="logout"
+        >
+          Sign Out
+        </Button>
+      </View>
+    );
+  };
+
+  return (
+    <View style={styles.container}>
+      {/* Animated Header */}
+      <Animated.View style={[
+        styles.animatedHeader,
+        { 
+          height: headerHeight,
+          opacity: headerOpacity,
+          backgroundColor: COLORS.SERENITY_BLUE 
+        }
+      ]}>
+        <LinearGradient
+          colors={[COLORS.SERENITY_BLUE, COLORS.MINDFUL_MINT]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.headerGradient}
+        >
+          <Avatar.Text 
+            size={80} 
+            label={user?.name?.substring(0, 2) || 'U'} 
+            style={styles.avatar}
+            color={COLORS.DEEP_REFLECTION}
+          />
+          <Title 
+            style={styles.name}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {user?.name || 'User'}
+          </Title>
+          <Paragraph 
+            style={styles.email}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {user?.email || 'user@example.com'}
+          </Paragraph>
+        </LinearGradient>
+      </Animated.View>
+      
+      {/* Compact Header (appears when scrolling) */}
+      <Animated.View style={[
+        styles.compactHeader,
+        { 
+          opacity: contentOpacity,
+          backgroundColor: COLORS.SERENITY_BLUE 
+        }
+      ]}>
+        <LinearGradient
+          colors={[COLORS.SERENITY_BLUE, COLORS.MINDFUL_MINT]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.compactHeaderGradient}
+        >
+          <View style={styles.compactHeaderContent}>
+            <Avatar.Text 
+              size={40} 
+              label={user?.name?.substring(0, 2) || 'U'} 
+              style={styles.compactAvatar}
+              color={COLORS.DEEP_REFLECTION}
+            />
+            <Title 
+              style={styles.compactName}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {user?.name || 'User'}
+            </Title>
           </View>
-          <Paragraph style={{ color: COLORS.DEEP_REFLECTION, opacity: 0.7, marginBottom: SPACING.SMALL }}>Track your emotional landscape this week</Paragraph>
-          {renderMoodGraph()}
-        </Card.Content>
-      </Card>
-
-      <Card style={styles.card}>
-        <Card.Content>
-          <Title style={{ color: COLORS.DEEP_REFLECTION }}>Practice Insights</Title>
-          <View style={styles.statsContainer}>
-            <View style={styles.stat}>
-              <Text style={[styles.statNumber, { color: COLORS.SERENITY_BLUE }]}>12</Text>
-              <Text style={[styles.statLabel, { color: COLORS.DEEP_REFLECTION }]}>Sessions</Text>
-            </View>
-            <View style={styles.stat}>
-              <Text style={[styles.statNumber, { color: COLORS.SERENITY_BLUE }]}>5</Text>
-              <Text style={[styles.statLabel, { color: COLORS.DEEP_REFLECTION }]}>Day Streak</Text>
-            </View>
-            <View style={styles.stat}>
-              <Text style={[styles.statNumber, { color: COLORS.SERENITY_BLUE }]}>8</Text>
-              <Text style={[styles.statLabel, { color: COLORS.DEEP_REFLECTION }]}>Practices</Text>
-            </View>
-          </View>
-        </Card.Content>
-      </Card>
-
-      {/* Crisis Resources Section */}
-      {renderCrisisResourcesSection()}
-
-      <Card style={styles.card}>
-        <Card.Content>
-          <Title>Preferences</Title>
-          <List.Item
-            title="Mindfulness Reminders"
-            description="Receive gentle daily reminders"
-            left={props => <List.Icon {...props} icon="bell-outline" />}
-            right={() => (
-              <Switch
-                value={notificationsEnabled}
-                onValueChange={setNotificationsEnabled}
-                color={theme.colors.primary}
-              />
-            )}
+        </LinearGradient>
+      </Animated.View>
+      
+      {/* Tab Navigation */}
+      <View style={styles.tabContainer}>
+        <TouchableOpacity 
+          style={[styles.tab, activeTab === 'overview' && styles.activeTab]} 
+          onPress={() => setActiveTab('overview')}
+        >
+          <MaterialCommunityIcons 
+            name="account" 
+            size={24} 
+            color={activeTab === 'overview' ? COLORS.SERENITY_BLUE : COLORS.DEEP_REFLECTION} 
           />
-          <Divider />
-          <List.Item
-            title="Night Mode"
-            description="Use softer colors in the evening"
-            left={props => <List.Icon {...props} icon="weather-night" />}
-            right={() => (
-              <Switch
-                value={darkModeEnabled}
-                onValueChange={setDarkModeEnabled}
-                color={theme.colors.primary}
-              />
-            )}
+          <Text style={[
+            styles.tabText, 
+            activeTab === 'overview' && styles.activeTabText
+          ]}>
+            Overview
+          </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={[styles.tab, activeTab === 'analytics' && styles.activeTab]} 
+          onPress={() => setActiveTab('analytics')}
+        >
+          <MaterialCommunityIcons 
+            name="chart-line" 
+            size={24} 
+            color={activeTab === 'analytics' ? COLORS.SERENITY_BLUE : COLORS.DEEP_REFLECTION} 
           />
-          <Divider />
-          <List.Item
-            title="Privacy Settings"
-            description="Manage your data and privacy"
-            left={props => <List.Icon {...props} icon="shield-account" />}
-            right={props => <List.Icon {...props} icon="chevron-right" />}
+          <Text style={[
+            styles.tabText, 
+            activeTab === 'analytics' && styles.activeTabText
+          ]}>
+            Analytics
+          </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={[styles.tab, activeTab === 'settings' && styles.activeTab]} 
+          onPress={() => setActiveTab('settings')}
+        >
+          <MaterialCommunityIcons 
+            name="cog" 
+            size={24} 
+            color={activeTab === 'settings' ? COLORS.SERENITY_BLUE : COLORS.DEEP_REFLECTION} 
           />
-          <Divider />
-          <List.Item
-            title="About This App"
-            description="Learn more about our approach"
-            left={props => <List.Icon {...props} icon="information" />}
-            right={props => <List.Icon {...props} icon="chevron-right" />}
-          />
-        </Card.Content>
-      </Card>
-
-      <Button 
-        mode="outlined" 
-        onPress={signOut}
-        style={[styles.signOutButton, { borderColor: theme.colors.primary }]}
-        color={theme.colors.primary}
-        icon="logout"
+          <Text style={[
+            styles.tabText, 
+            activeTab === 'settings' && styles.activeTabText
+          ]}>
+            Settings
+          </Text>
+        </TouchableOpacity>
+      </View>
+      
+      {/* Main Content */}
+      <Animated.ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.contentContainer}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: false }
+        )}
+        scrollEventThrottle={16}
       >
-        Sign Out
-      </Button>
+        {activeTab === 'overview' && renderOverviewTab()}
+        {activeTab === 'analytics' && renderAnalyticsTab()}
+        {activeTab === 'settings' && renderSettingsTab()}
+      </Animated.ScrollView>
+      
+      {/* Quick Action FAB */}
+      <FAB
+        style={styles.fab}
+        icon="plus"
+        color={COLORS.WHITE}
+        onPress={navigateToJournal}
+      />
 
       {/* Emergency Contact Dialog */}
       <Portal>
@@ -766,7 +969,7 @@ const ProfileScreen = () => {
           </Dialog.Actions>
         </Dialog>
       </Portal>
-    </ScrollView>
+    </View>
   );
 };
 
@@ -777,16 +980,20 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: SPACING.MEDIUM,
+    paddingTop: 220, // Space for the header
   },
-  header: {
-    alignItems: 'center',
-    marginTop: SPACING.XLARGE,
-    marginBottom: SPACING.LARGE,
-    backgroundColor: COLORS.SERENITY_BLUE,
+  animatedHeader: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1,
+  },
+  headerGradient: {
+    flex: 1,
     padding: SPACING.LARGE,
-    borderRadius: BORDER_RADIUS.MEDIUM,
-    ...SHADOWS.MEDIUM,
-    marginHorizontal: SPACING.MEDIUM,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.SERENITY_BLUE,
   },
   avatar: {
     marginBottom: SPACING.MEDIUM,
@@ -807,6 +1014,68 @@ const styles = StyleSheet.create({
     fontSize: 14,
     paddingHorizontal: SPACING.SMALL,
     width: '100%',
+  },
+  compactHeader: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1,
+    height: 80,
+  },
+  compactHeaderGradient: {
+    flex: 1,
+    padding: SPACING.MEDIUM,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.SERENITY_BLUE,
+  },
+  compactHeaderContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  compactAvatar: {
+    marginRight: SPACING.SMALL,
+    backgroundColor: COLORS.MINDFUL_MINT,
+  },
+  compactName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.WHITE,
+    flex: 1,
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    backgroundColor: COLORS.WHITE,
+    paddingVertical: SPACING.MEDIUM,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+    marginTop: 80, // Height of compact header
+  },
+  tab: {
+    alignItems: 'center',
+    paddingVertical: SPACING.SMALL,
+    paddingHorizontal: SPACING.MEDIUM,
+  },
+  activeTab: {
+    borderBottomWidth: 2,
+    borderBottomColor: COLORS.SERENITY_BLUE,
+  },
+  tabText: {
+    fontSize: SPACING.SMALL,
+    textAlign: 'center',
+    color: COLORS.DEEP_REFLECTION,
+    marginTop: 4,
+  },
+  activeTabText: {
+    fontWeight: 'bold',
+    color: COLORS.SERENITY_BLUE,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  tabContent: {
+    paddingBottom: SPACING.XXLARGE,
   },
   quickActions: {
     flexDirection: 'row',
@@ -840,6 +1109,45 @@ const styles = StyleSheet.create({
     top: -4,
     right: -4,
     backgroundColor: COLORS.HOPEFUL_CORAL,
+  },
+  progressContainer: {
+    alignItems: 'center',
+    marginTop: SPACING.MEDIUM,
+  },
+  progressText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: COLORS.SERENITY_BLUE,
+    marginBottom: SPACING.SMALL,
+  },
+  progressBar: {
+    height: 12,
+    width: '100%',
+    borderRadius: 6,
+    marginBottom: SPACING.SMALL,
+  },
+  progressLabel: {
+    fontSize: 14,
+    color: COLORS.DEEP_REFLECTION,
+  },
+  timeContainer: {
+    alignItems: 'center',
+    marginTop: SPACING.MEDIUM,
+  },
+  timeValue: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: COLORS.SERENITY_BLUE,
+  },
+  timeLabel: {
+    fontSize: 16,
+    color: COLORS.DEEP_REFLECTION,
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 16,
+    right: 16,
+    backgroundColor: COLORS.SERENITY_BLUE,
   },
   card: {
     marginBottom: SPACING.MEDIUM,
