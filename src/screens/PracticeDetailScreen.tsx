@@ -825,6 +825,48 @@ const getPracticeContent = (id: string) => {
           text: 'Regular mental check-ins can help you:\n\n• Catch stress and overwhelm before they escalate\n\n• Identify patterns in your emotional responses\n\n• Develop greater emotional intelligence and self-awareness\n\n• Make choices that better support your well-being\n\n• Cultivate a more compassionate relationship with yourself'
         }
       ];
+    case '14': // Gratitude Journaling
+      return [
+        {
+          text: 'Gratitude journaling is an accessible and powerful way to incorporate mindfulness into your daily routine. By spending a few minutes each day recording things you\'re grateful for, you naturally focus more on life\'s positive aspects. Follow these steps to start your gratitude journaling practice.'
+        },
+        {
+          title: 'Step 1: Dedicate a Specific Time',
+          text: 'Choose a consistent time each day for your gratitude practice—morning or evening often works best. Setting a regular schedule helps establish the habit and ensures you don\'t forget.'
+        },
+        {
+          title: 'Step 2: Write Down What You\'re Grateful For',
+          text: 'List three to five things that make you feel grateful. These can range from major life events to small everyday joys, such as a sunny morning or enjoying your favorite beverage.'
+        },
+        {
+          title: 'Step 3: Reflect on Your List',
+          text: 'Spend a moment reflecting on your list, noting the thoughts and emotions that surface as you consider your gratitude. If you feel inspired to continue writing, allow yourself to do so freely.'
+        },
+        {
+          title: 'Step 4: Be Specific and Detailed',
+          text: 'Rather than writing general statements like "I\'m grateful for my family," try to be specific: "I\'m grateful for my sister\'s supportive phone call yesterday when I was feeling overwhelmed."'
+        },
+        {
+          title: 'Step 5: Include New Items Daily',
+          text: 'Challenge yourself to include at least one or two new items each day. This encourages you to notice fresh sources of gratitude rather than repeating the same entries.'
+        },
+        {
+          title: 'Step 6: Focus on People',
+          text: 'When possible, include gratitude for people in your life. Research suggests that expressing gratitude for people rather than just things or circumstances can be especially beneficial for well-being.'
+        },
+        {
+          title: 'Step 7: Notice the Unexpected',
+          text: 'Pay attention to unexpected positive events or silver linings in challenging situations. For example: "I\'m grateful that my delayed flight gave me time to finish my book."'
+        },
+        {
+          title: 'Practice Tips',
+          text: '• Keep your journal by your bed or set a reminder on your phone to maintain consistency\n\n• If you miss a day, simply resume the next day without self-criticism\n\n• Consider using a special notebook that brings you joy when you use it\n\n• Experiment with different formats—written, digital, voice recordings, or even a gratitude jar\n\n• Share your practice with others by starting family gratitude rituals or exchanging grateful moments with friends'
+        },
+        {
+          title: 'Benefits',
+          text: 'Regular gratitude journaling has been shown to:\n\n• Increase positive emotions and reduce negative ones\n\n• Improve sleep quality\n\n• Strengthen relationships\n\n• Reduce stress and symptoms of depression\n\n• Enhance overall life satisfaction and well-being\n\n• Build resilience during challenging times'
+        }
+      ];
     case '6': // Personal Acceptance Goals
       return [
         {

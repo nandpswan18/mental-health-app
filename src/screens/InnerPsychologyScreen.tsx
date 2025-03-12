@@ -106,6 +106,12 @@ const innerPsychologyResources: PsychologyResource[] = [
     title: 'Mental Check-In',
     description: 'A simple practice to pause and assess your mental and emotional state, helping you reflect on your feelings and thoughts without judgment.',
     category: 'present-moment'
+  },
+  {
+    id: '14',
+    title: 'Gratitude Journaling',
+    description: 'A mindfulness practice of regularly recording things you are grateful for, helping shift focus to life\'s positive aspects and improve overall well-being.',
+    category: 'present-moment'
   }
 ];
 
