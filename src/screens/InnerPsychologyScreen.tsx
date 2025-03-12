@@ -78,24 +78,6 @@ const innerPsychologyResources: PsychologyResource[] = [
   
   // Present Moment resources
   {
-    id: '7',
-    title: 'Breath Awareness',
-    description: 'Focus attention on your breathing as an anchor to the present moment, noticing the sensations of each inhale and exhale.',
-    category: 'present-moment'
-  },
-  {
-    id: '8',
-    title: 'Sensory Grounding',
-    description: 'Use the 5-4-3-2-1 technique: notice 5 things you see, 4 things you feel, 3 things you hear, 2 things you smell, and 1 thing you taste.',
-    category: 'present-moment'
-  },
-  {
-    id: '9',
-    title: 'Mindful Activities',
-    description: 'Bring full attention to everyday activities like eating, walking, or washing dishes, experiencing them with all your senses.',
-    category: 'present-moment'
-  },
-  {
     id: '12',
     title: '5-4-3-2-1 Technique',
     description: 'A structured grounding exercise that engages all five senses to anchor you in the present moment and reduce anxiety or stress.',
